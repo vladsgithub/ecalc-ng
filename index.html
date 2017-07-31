@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/app.css">
+
+    <script src="angular.min.js"></script>
+    <script src="app.js"></script>
+</head>
+<body ng-app="app" ng-controller="calculatorCtrl">
+
+<header>
+	<span ng-repeat="account in expCalc.accounts track by $index">
+		<button class="btn btn-primary"
+				ng-class="{'active': expCalc.settings.currentAccount==$index}"
+				ng-click="expCalc.settings.currentAccount=$index">
+			{{$index}} - {{account.meta.title}}
+		</button>
+	</span>
+	<button class="btn btn-primary" ng-click="createAccount()">
+		<i class="fa fa-plus"></i>
+	</button>
+</header>
+
+<main>
+	<ul class="accounts">
+		<li ng-repeat="account in expCalc.accounts track by $index"
+			ng-if="expCalc.settings.currentAccount == $index">
+
+			<header>
+				<h5>
+					<label>
+						<div>Название расчёта:</div>
+						<input class="form-control inline-block" ng-model="account.meta.title" data-account-index="$index">
+					</label>
+					<button class="btn btn-danger btn-sm" ng-click="removeAccount(this)">Удалить расчет</button>
+				</h5>
+			</header>
+
+			<ul class="layout">
+				<li class="step1">
+					<!--=========== STEP 1 ============-->
+					<h5 class="margin5-0">Шаг 1: Список участников и расходов</h5>
+					<h5 class="margin5-0 flex">
+						<span class="flex-grow1">Всего расходов:</span>
+						<span class="text-uppercase">
+							<b>
+								{{roundOff(account.meta.total)}}
+								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+							</b>
+						</span>
+					</h5>
+
+					<ul class="participants">
+						<li class="padding5-0" ng-repeat="participant in account.participants track by $index">
+							<div class="flex padding5-0 bg">
+								<div class="nowrap">{{$index}}</div>
+								<div>
+									<button class="btn btn-danger" ng-click="removeParticipant(this)">
+										<i class="fa fa-minus"></i>
+									</button>
+								</div>
+								<div class="flex-grow1">
+									<input class="form-control" type="text" ng-model="participant.meta.title" placeholder="Новый участник">
+								</div>
+								<div>
+									<h5 class="nowrap text-uppercase">
+										{{roundOff(participant.meta.total)}}
+										{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+									</h5>
+								</div>
+							</div>
+
+							<ul class="expenses">
+								<li class="padding5-0 bg" ng-repeat="expense in participant.expenses track by $index">
+									<div>
+
+										rate = {{rate = expCalc.settings.currencies.rates[account.settings.accountCurrency][expense.currency]}}
+										<br/>
+										expense = {{participant.meta.total + expense.value * rate}}
+									</div>
+									<div class="flex">
+										<div class="nowrap">{{$index}}</div>
+										<div>
+											<button class="btn btn-danger" ng-click="removeExpense(this)">
+												<i class="fa fa-minus"></i>
+											</button>
+										</div>
+										<div class="flex-grow1">
+											<input class="form-control" type="text" ng-model="expense.title" placeholder="Новый расход">
+										</div>
+										<div>
+											{{expense.type}}
+											<select class="form-control" ng-model="expense.type">
+												<option ng-repeat="expensesType in expCalc.settings.expensesTypes track by $index"
+														value="{{$index}}" ng-selected="expense.type == '$index'">
+													{{expensesType.name}}
+												</option>
+											</select>
+										</div>
+									</div>
+
+									<div class="flex padding5-0">
+										<div class="date">{{formatDate(expense.date)}}</div>
+										<div class="flex-grow1">
+											<input class="form-control" type="number" placeholder="сумма"
+												   ng-model="expense.value" ng-change="updateData(this)">
+										</div>
+										<div class="currency">
+											<select class="form-control" ng-model="expense.currency"
+													ng-options="key as value for (key, value) in expCalc.settings.currencies.names"
+													ng-change="updateData(this)">
+											</select>
+										</div>
+									</div>
+								</li>
+
+								<li class="padding5-0 bg">
+									<button class="btn btn-primary" ng-click="addNewExpense(this)">
+										<i class="fa fa-plus"></i>
+									</button>
+									Добавить новый расход
+								</li>
+							</ul>
+						</li>
+
+						<li class="padding5-0">
+							<button class="btn btn-primary" ng-click="createParticipant(expCalc.accounts.indexOf(account))">
+								<i class="fa fa-plus"></i>
+							</button>
+							Добавить нового участника
+						</li>
+					</ul>
+
+				</li>
+
+				<li class="step2">
+					<!--=========== STEP 2 ============-->
+					<h5 class="margin5-0">Шаг 2: Расчет на каждого участника</h5>
+					<h5 class="margin5-0 flex">
+						<span class="flex-grow1">Весь возврат:</span>
+						<span>
+							<b>???</b>
+						</span>
+					</h5>
+
+					<ul class="participants">
+						<li class="padding5-0" ng-repeat="participant in account.participants track by $index">
+							<div class="flex padding5-0 bg">
+								<div class="nowrap">{{$index}}</div>
+								<div class="flex-grow1">
+									<h5 class="nowrap">{{participant.meta.title}}</h5>
+								</div>
+								<div class="participation">
+									<input class="form-control" type="number"
+										   ng-model="participant.meta.participation"
+										   ng-change="updateFullParticipation()">
+								</div>
+							</div>
+
+							<div class="flex padding5-0 bg">
+								<div class="balance">
+									<span>Баланс</span>
+									<div>???</div>
+								</div>
+								<div class="share">
+									<span>Доля</span>
+									<div>???</div>
+								</div>
+							</div>
+
+							<ul class="part-list" ng-repeat="array in participant.participationList track by $index"
+								ng-init="participantIndex = $index">
+								<li class="padding10-0 bg clearfix border-top-1" ng-repeat="participation in array track by $index"
+									ng-init="expenseIndex = $index">
+									<label>
+										<input type="checkbox" ng-model="participant.participationList[participantIndex][expenseIndex].value">
+										{{account.participants[participantIndex].expenses[expenseIndex].title}}
+										[<b>{{account.participants[participantIndex].meta.title}}</b>]
+									</label>
+
+									<div ng-init="accountCurrency = expCalc.accounts[expCalc.settings.currentAccount].settings.accountCurrency">
+										{{participant.participationList[participantIndex][expenseIndex].value}} *
+										{{participant.meta.participation}} *
+										{{account.participants[participantIndex].expenses[expenseIndex].value}} *
+										{{expCalc.settings.currencies.rates[accountCurrency][account.participants[participantIndex].expenses[expenseIndex].currency]}} /
+										{{account.meta.fullParticipation}} =
+										<!--{{getShare(participantIndex, expenseIndex)}}-->
+									</div>
+
+									<div>
+										{{someValue = account.participants[participantIndex].expenses[expenseIndex].value / account.meta.fullParticipation}}
+										{{updateCalculation(someValue)}}
+									</div>
+
+									<div>
+										{{participant.participationList[participantIndex][expenseIndex]}}
+									</div>
+
+									<span class="float-right text-uppercase">
+										{{expCalc.settings.currencies.names[account.participants[participantIndex].expenses[expenseIndex].currency]}}
+
+										{{account.participants[participantIndex].expenses[expenseIndex].value}}
+									</span>
+								</li>
+							</ul>
+
+						</li>
+					</ul>
+				</li>
+
+				<li>
+					<!--=========== STEP 3 ============-->
+					<h5>Step 3</h5>
+
+				</li>
+			</ul>
+		</li>
+	</ul>
+
+	<div style="display: none;">{{expCalc}}</div>
+	<div id="testing" class="testing"></div>
+</main>
+
+</body>
+</html>
