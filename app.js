@@ -94,39 +94,45 @@
             });
         };
 
-		$scope.updateData = function(obj) {
-			if (obj.expense.value >= 0) {
-                if (!obj.expense.date) obj.expense.date = new Date();
-			} else {
-                obj.expense.value = 0;
-			}
 
-            // $scope.updateParticipantTotal(obj);
-            // $scope.updateAccountTotal();
+
+        $scope.getAccountTotal = function(account) {
+            account.meta.total = 0;
+
+            account.participants.forEach(function(participant, i, arr) {
+                account.meta.total += participant.meta.total;
+            });
+
+            console.log('getAccountTotal');
+            return $scope.roundOff(account.meta.total);
 		};
 
-		$scope.updateParticipantTotal = function(obj) {
-			var participant = obj.$parent.participant;
-			var accountCurrency = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount].settings.accountCurrency;
+        $scope.getParticipantTotal = function(account, participant) {
+        	var rates = $scope.expCalc.settings.currencies.rates[account.settings.accountCurrency];
 
             participant.meta.total = 0;
 
-            participant.expenses.forEach(function(item, i, arr) {
-                var rate = $scope.expCalc.settings.currencies.rates[accountCurrency][item.currency];
-
-                participant.meta.total += item.value * rate;
+            participant.expenses.forEach(function(expense, i, arr) {
+                participant.meta.total += expense.value * rates[expense.currency];
             });
+
+            console.log('getParticipantTotal');
+            return $scope.roundOff(participant.meta.total);
 		};
 
-		$scope.updateAccountTotal = function() {
-			var account = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
 
-			account.meta.total = 0;
 
-            account.participants.forEach(function(item, i, arr) {
-                account.meta.total += item.meta.total;
-            });
+
+		$scope.updateData = function(obj) {
+			if (obj.expense.value >= 0) {
+                if (!obj.expense.date) obj.expense.date = '' + new Date();
+			} else {
+                obj.expense.value = 0;
+			}
 		};
+
+
+
 
 		$scope.updateFullParticipation = function() {
             var account = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
@@ -188,7 +194,6 @@
 
 			$scope.expCalc.accounts[accountIndex].participants.splice(participantIndex, 1);
 			$scope.removeArrayFromParticipationLists(accountIndex, participantIndex);
-            $scope.updateAccountTotal();
             $scope.updateFullParticipation();
 		};
 
@@ -199,8 +204,6 @@
 
 			$scope.expCalc.accounts[accountIndex].participants[participantIndex].expenses.splice(expenseIndex, 1);
 			$scope.removeValueFromParticipationLists(accountIndex, participantIndex, expenseIndex);
-            $scope.updateParticipantTotal(obj);
-            $scope.updateAccountTotal();
 		};
 
 		$scope.removeArrayFromParticipationLists = function(accountIndex, participantIndex) {

@@ -49,7 +49,7 @@
 						<span class="flex-grow1">Всего расходов:</span>
 						<span class="text-uppercase">
 							<b>
-								{{roundOff(account.meta.total)}}
+								{{getAccountTotal(account)}}
 								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
 							</b>
 						</span>
@@ -69,7 +69,7 @@
 								</div>
 								<div>
 									<h5 class="nowrap text-uppercase">
-										{{roundOff(participant.meta.total)}}
+										{{getParticipantTotal(account, participant)}}
 										{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
 									</h5>
 								</div>
@@ -77,12 +77,12 @@
 
 							<ul class="expenses">
 								<li class="padding5-0 bg" ng-repeat="expense in participant.expenses track by $index">
-									<div>
 
-										rate = {{rate = expCalc.settings.currencies.rates[account.settings.accountCurrency][expense.currency]}}
-										<br/>
-										expense = {{participant.meta.total + expense.value * rate}}
+									<div class="test-block">
+										rate = {{rate = expCalc.settings.currencies.rates[account.settings.accountCurrency][expense.currency]}};
+										expenseWithRate = {{expense.value * rate}}
 									</div>
+
 									<div class="flex">
 										<div class="nowrap">{{$index}}</div>
 										<div>
@@ -94,7 +94,6 @@
 											<input class="form-control" type="text" ng-model="expense.title" placeholder="Новый расход">
 										</div>
 										<div>
-											{{expense.type}}
 											<select class="form-control" ng-model="expense.type">
 												<option ng-repeat="expensesType in expCalc.settings.expensesTypes track by $index"
 														value="{{$index}}" ng-selected="expense.type == '$index'">
