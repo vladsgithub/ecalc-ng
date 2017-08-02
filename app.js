@@ -29,6 +29,7 @@
 		};
 
 		$scope.createParticipant = function(accountIndex) {
+            // todo: probably rework this method - it could receive objects: account
 			var participantIndex = $scope.expCalc.accounts[accountIndex].participants.length;
 			var newParticipant = {
 				meta: {
@@ -48,8 +49,10 @@
 
 			$scope.expCalc.accounts[accountIndex].participants.push(newParticipant);
 
-            $scope.createParticipationList(accountIndex, participantIndex);
-			$scope.updateFullParticipation();
+            $scope.addParticipantToPartList($scope.expCalc.accounts[accountIndex]);
+
+            // $scope.createParticipationList(accountIndex, participantIndex);
+			// $scope.updateFullParticipation();
 		};
 
         $scope.createParticipationList = function(accountIndex, participantIndex) {
@@ -70,6 +73,9 @@
         };
 
         $scope.addNewExpense = function(obj) {
+        	// todo: probably rework this method - it could receive objects: account, participant
+        	console.log('obj', obj);
+
             var accountIndex = obj.$parent.$parent.$index;
             var participantIndex = obj.$index;
             var expenseIndex = obj.participant.expenses.length;
@@ -78,12 +84,25 @@
                 type: '0',
                 date: null,
                 value: null,
-                currency: obj.$parent.$parent.account.settings.accountCurrency
+                currency: obj.$parent.$parent.account.settings.accountCurrency,
+				partList: []
             };
 
+            $scope.expCalc.accounts[accountIndex].participants.forEach(function(participant, i, arr) {
+                newExpense.partList.push(true);
+			});
+
             obj.participant.expenses.push(newExpense);
-            $scope.addValueToParticipationLists(accountIndex, participantIndex);
+            // $scope.addValueToParticipationLists(accountIndex, participantIndex);
         };
+
+        $scope.addParticipantToPartList = function(account) {
+            account.participants.forEach(function(participant, i, arr) {
+            	participant.expenses.forEach(function(expense, i, arr) {
+                    expense.partList.push(true);
+				});
+			});
+		};
 
         $scope.addValueToParticipationLists = function(accountIndex, participantIndex) {
             $scope.expCalc.accounts[accountIndex].participants.forEach(function(item, i, arr) {
@@ -93,6 +112,7 @@
                 });
             });
         };
+
 
 
 
@@ -123,7 +143,7 @@
 
 
 
-		$scope.updateData = function(obj) {
+		$scope.fixDate = function(obj) {
 			if (obj.expense.value >= 0) {
                 if (!obj.expense.date) obj.expense.date = '' + new Date();
 			} else {
@@ -193,8 +213,10 @@
 			var participantIndex = obj.$index;
 
 			$scope.expCalc.accounts[accountIndex].participants.splice(participantIndex, 1);
-			$scope.removeArrayFromParticipationLists(accountIndex, participantIndex);
-            $scope.updateFullParticipation();
+			$scope.removeParticipantFromPartList($scope.expCalc.accounts[accountIndex], participantIndex);
+
+            // $scope.removeArrayFromParticipationLists(accountIndex, participantIndex);
+            // $scope.updateFullParticipation();
 		};
 
 		$scope.removeExpense = function(obj) {
@@ -203,8 +225,16 @@
 			var expenseIndex = obj.$index;
 
 			$scope.expCalc.accounts[accountIndex].participants[participantIndex].expenses.splice(expenseIndex, 1);
-			$scope.removeValueFromParticipationLists(accountIndex, participantIndex, expenseIndex);
+			// $scope.removeValueFromParticipationLists(accountIndex, participantIndex, expenseIndex);
 		};
+
+        $scope.removeParticipantFromPartList = function(account, participantIndex) {
+            account.participants.forEach(function(participant, i, arr) {
+                participant.expenses.forEach(function(expense, i, arr) {
+                    expense.partList.splice(participantIndex, 1);
+				});
+			});
+        };
 
 		$scope.removeArrayFromParticipationLists = function(accountIndex, participantIndex) {
 			$scope.expCalc.accounts[accountIndex].participants.forEach(function(item, i, arr) {
@@ -230,7 +260,8 @@
 				.replace(/,/g, ",<hr>").replace(/:/g, ": ")
                 .replace(/},<hr>{/g, "},{").replace(/],<hr>\[/g, "],[")
                 .replace(/],\[/g, "<ar>],[</ar>").replace(/},{/g, "<arr>},{</arr>")
-				.replace(/"participants": \[/g, "<b>\"participants\": [</b>")
+				.replace(/Участник/g, "<b>Участник</b>")
+                .replace(/"participants": \[/g, "<b>\"participants\": [</b>")
                 .replace(/"currencies": {<div>/g, "\"currencies\": {<div class='compressed'>")
                 .replace(/"expensesTypes": \[<div>/g, "\"expensesTypes\": [<div class='compressed'>");
 
