@@ -49,7 +49,7 @@
 						<span class="flex-grow1">Всего расходов:</span>
 						<span class="text-uppercase">
 							<b>
-								{{getAccountTotal(account)}}
+								{{roundOff(getAccountTotal(account))}}
 								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
 							</b>
 						</span>
@@ -69,7 +69,7 @@
 								</div>
 								<div>
 									<h5 class="nowrap text-uppercase">
-										{{getParticipantTotal(account, participant)}}
+										{{roundOff(getParticipantTotal(account, participant))}}
 										{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
 									</h5>
 								</div>
@@ -79,8 +79,7 @@
 								<li class="padding5-0 bg" ng-repeat="expense in participant.expenses track by $index">
 
 									<div class="test-block">
-										rate = {{rate = expCalc.settings.currencies.rates[account.settings.accountCurrency][expense.currency]}};
-										expenseWithRate = {{expense.value * rate}}
+										expenseWithRate = {{getExpenseWithRate(account, expense)}}
 									</div>
 
 									<div class="flex">
@@ -146,71 +145,87 @@
 							<b>???</b>
 						</span>
 					</h5>
+					<h5 class="margin5-0 warning clearfix">
+						<span>Сумма расходов:</span>
+						<span class="float-right text-uppercase">
+							<b>
+								{{getAccountTotal(account)}}
+								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+							</b>
+						</span>
+					</h5>
+					<h5 class="margin5-0 warning clearfix">
+						<span>Сумма долей:</span>
+						<span class="float-right text-uppercase">
+							<b>
+								{{getShareTotal(account)}}
+								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+							</b>
+						</span>
+					</h5>
+					<h5 class="margin5-0 warning clearfix">
+						<span>Погрешность расчетов:</span>
+						<span class="float-right">
+							<b>{{getAccountTotal(account) - getShareTotal(account)}}</b>
+						</span>
+					</h5>
 
 					<ul class="participants">
-						<li class="padding5-0" ng-repeat="participant in account.participants track by $index">
+						<li class="padding5-0" ng-repeat="extParticipant in account.participants track by $index"
+							ng-init="extParticipantIndex = $index">
 							<div class="flex padding5-0 bg">
-								<div class="nowrap">{{$index}}</div>
+								<div class="nowrap">{{extParticipantIndex}}</div>
 								<div class="flex-grow1">
-									<h5 class="nowrap">{{participant.meta.title}}</h5>
+									<h5 class="nowrap">{{extParticipant.meta.title}}</h5>
 								</div>
 								<div class="participation">
 									<input class="form-control" type="number"
-										   ng-model="participant.meta.participation"
-										   ng-change="updateFullParticipation()">
+										   ng-model="extParticipant.meta.participation">
 								</div>
 							</div>
 
 							<div class="flex padding5-0 bg">
 								<div class="balance">
-									<span>Баланс</span>
-									<div>???</div>
+									<h5>Баланс</h5>
+									<h5>???</h5>
 								</div>
 								<div class="share">
-									<span>Доля</span>
-									<div>???</div>
+									<h5>Доля</h5>
+									<h5 class="text-uppercase">
+										{{roundOff(getParticipantShare(account, extParticipantIndex))}}
+										{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+									</h5>
 								</div>
 							</div>
 
-							<ul class="part-list" ng-repeat="intParticipant in account.participants track by $index">
-								<li>{{intParticipant.meta.title}}</li>
+							<ul class="part-list">
+								<li class="bg" ng-repeat="intParticipant in account.participants track by $index">
+									<hr/>
+									{{intParticipant.meta.title}}<br/>
+
+									<ul class="part-list">
+										<li class="padding5-0" ng-repeat="expense in intParticipant.expenses track by $index">
+											<label>
+												<input type="checkbox" ng-model="expense.partList[extParticipantIndex]">
+												{{expense.title}}
+
+												<div>
+													<!-- partList[] * participation * expense / partSumOfExpense -->
+													{{expense.partList[extParticipantIndex]}} *
+													{{extParticipant.meta.participation}} *
+													{{getExpenseWithRate(account, expense)}} /
+													{{getPartSumOfExpense(account, expense)}} =
+												</div>
+											</label>
+
+											<span class="float-right text-uppercase">
+												<b>{{roundOff(getExpenseShare(account, expense, extParticipantIndex))}}</b>
+											</span>
+										</li>
+									</ul>
+									<hr/>
+								</li>
 							</ul>
-
-							<!--<ul class="part-list" ng-repeat="array in participant.participationList track by $index"-->
-								<!--ng-init="participantIndex = $index">-->
-								<!--<li class="padding10-0 bg clearfix border-top-1" ng-repeat="participation in array track by $index"-->
-									<!--ng-init="expenseIndex = $index">-->
-									<!--<label>-->
-										<!--<input type="checkbox" ng-model="participant.participationList[participantIndex][expenseIndex].value">-->
-										<!--{{account.participants[participantIndex].expenses[expenseIndex].title}}-->
-										<!--<b>[ {{account.participants[participantIndex].meta.title}} ]</b>-->
-									<!--</label>-->
-
-									<!--<div ng-init="accountCurrency = expCalc.accounts[expCalc.settings.currentAccount].settings.accountCurrency">-->
-										<!--{{participant.participationList[participantIndex][expenseIndex].value}} *-->
-										<!--{{participant.meta.participation}} *-->
-										<!--{{account.participants[participantIndex].expenses[expenseIndex].value}} *-->
-										<!--{{expCalc.settings.currencies.rates[accountCurrency][account.participants[participantIndex].expenses[expenseIndex].currency]}} /-->
-										<!--{{account.meta.fullParticipation}} =-->
-										<!--&lt;!&ndash;{{getShare(participantIndex, expenseIndex)}}&ndash;&gt;-->
-									<!--</div>-->
-
-									<!--<div>-->
-										<!--{{someValue = account.participants[participantIndex].expenses[expenseIndex].value / account.meta.fullParticipation}}-->
-										<!--{{updateCalculation(someValue)}}-->
-									<!--</div>-->
-
-									<!--<div>-->
-										<!--{{participant.participationList[participantIndex][expenseIndex]}}-->
-									<!--</div>-->
-
-									<!--<span class="float-right text-uppercase">-->
-										<!--{{expCalc.settings.currencies.names[account.participants[participantIndex].expenses[expenseIndex].currency]}}-->
-
-										<!--{{account.participants[participantIndex].expenses[expenseIndex].value}}-->
-									<!--</span>-->
-								<!--</li>-->
-							<!--</ul>-->
 
 						</li>
 					</ul>

@@ -80,6 +80,8 @@ ol, ul {
 	overflow: hidden;
 	background: aquamarine;
 }
+
+
 html {
 	font-size: 14px;
 }
@@ -89,6 +91,10 @@ body {
 }
 header {
 	padding: 10px;
+}
+.warning {
+	background-color: #ffe2e2;
+	color: #970000;
 }
 .btn {
 	cursor: pointer;

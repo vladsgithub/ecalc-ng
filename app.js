@@ -7,6 +7,9 @@
 
     var calculatorCtrl = ['$scope', 'getDataService', function($scope, getDataService) {
 
+
+
+    	// METHODS OF CREATING ===============================
 		$scope.createAccount = function() {
 			var accounts = $scope.expCalc.accounts;
 			var accountIndex = accounts.length;
@@ -38,7 +41,6 @@
 					preferredCurrency: $scope.expCalc.settings.baseCurrency,
 					total: 0
 				},
-				participationList: [],
 				expenses: [],
 				fixation: {
 					total: 0,
@@ -50,31 +52,50 @@
 			$scope.expCalc.accounts[accountIndex].participants.push(newParticipant);
 
             $scope.addParticipantToPartList($scope.expCalc.accounts[accountIndex]);
-
-            // $scope.createParticipationList(accountIndex, participantIndex);
-			// $scope.updateFullParticipation();
 		};
 
-        $scope.createParticipationList = function(accountIndex, participantIndex) {
-            var participants = $scope.expCalc.accounts[accountIndex].participants;
-            var currentParticipationList = participants[participantIndex].participationList;
 
-            participants.forEach(function(item, i, arr) {
-                if (i != participantIndex) item.participationList.push([]);
-                currentParticipationList.push([]);
 
-                item.expenses.forEach(function(item2, i2, arr2) {
-                    currentParticipationList[i].push({
-                        value: true,
-                        share: null
-                    });
+
+
+
+        // METHODS OF REMOVING ===============================
+        $scope.removeAccount = function(obj) {
+            $scope.expCalc.accounts.splice(obj.$index, 1);
+        };
+
+        $scope.removeParticipant = function(obj) {
+            var accountIndex = obj.$parent.$parent.$index;
+            var participantIndex = obj.$index;
+
+            $scope.expCalc.accounts[accountIndex].participants.splice(participantIndex, 1);
+            $scope.removeParticipantFromPartList($scope.expCalc.accounts[accountIndex], participantIndex);
+        };
+
+        $scope.removeExpense = function(obj) {
+            var accountIndex = obj.$parent.$parent.$parent.$index;
+            var participantIndex = obj.$parent.$index;
+            var expenseIndex = obj.$index;
+
+            $scope.expCalc.accounts[accountIndex].participants[participantIndex].expenses.splice(expenseIndex, 1);
+        };
+
+        $scope.removeParticipantFromPartList = function(account, participantIndex) {
+            account.participants.forEach(function(participant, i, arr) {
+                participant.expenses.forEach(function(expense, i, arr) {
+                    expense.partList.splice(participantIndex, 1);
                 });
             });
         };
 
+
+
+
+
+
+        // METHODS OF ADDING ===============================
         $scope.addNewExpense = function(obj) {
         	// todo: probably rework this method - it could receive objects: account, participant
-        	console.log('obj', obj);
 
             var accountIndex = obj.$parent.$parent.$index;
             var participantIndex = obj.$index;
@@ -93,7 +114,6 @@
 			});
 
             obj.participant.expenses.push(newExpense);
-            // $scope.addValueToParticipationLists(accountIndex, participantIndex);
         };
 
         $scope.addParticipantToPartList = function(account) {
@@ -116,6 +136,9 @@
 
 
 
+
+
+        // METHODS OF GETTING ===============================
         $scope.getAccountTotal = function(account) {
             account.meta.total = 0;
 
@@ -123,8 +146,7 @@
                 account.meta.total += participant.meta.total;
             });
 
-            console.log('getAccountTotal');
-            return $scope.roundOff(account.meta.total);
+            return account.meta.total;
 		};
 
         $scope.getParticipantTotal = function(account, participant) {
@@ -136,12 +158,66 @@
                 participant.meta.total += expense.value * rates[expense.currency];
             });
 
-            console.log('getParticipantTotal');
-            return $scope.roundOff(participant.meta.total);
+            return participant.meta.total;
+		};
+
+        $scope.getExpenseWithRate = function(account, expense) {
+        	var rate = $scope.expCalc.settings.currencies.rates[account.settings.accountCurrency][expense.currency];
+
+            return expense.value * rate;
+		};
+
+        $scope.getPartSumOfExpense = function(account, expense) {
+        	var partSumOfExpense = 0;
+
+            expense.partList.forEach(function(participation, i, arr) {
+                if (participation) {
+                    partSumOfExpense += account.participants[i].meta.participation;
+				}
+			});
+
+            return partSumOfExpense;
+		};
+
+        $scope.getExpenseShare = function(account, expense, extParticipantIndex) {
+        	return expense.partList[extParticipantIndex] *
+                account.participants[extParticipantIndex].meta.participation *
+				$scope.getExpenseWithRate(account, expense) /
+				$scope.getPartSumOfExpense(account, expense);
+		};
+
+        $scope.getParticipantShare = function(account, extParticipantIndex) {
+        	var participantShare = 0;
+
+        	account.participants.forEach(function(participant, i, arr) {
+        		participant.expenses.forEach(function(expense, i, arr) {
+        			participantShare += $scope.getExpenseShare(account, expense, extParticipantIndex);
+				});
+			});
+
+        	return participantShare;
+        };
+
+        $scope.getShareTotal = function(account) {
+        	var shareTotal = 0;
+
+        	account.participants.forEach(function(participant, i, arr) {
+                shareTotal += $scope.getParticipantShare(account, i);
+			});
+
+        	return shareTotal;
 		};
 
 
 
+
+
+
+        // OTHER METHODS ===============================
+        $scope.roundOff = function(value) {
+            if (value === undefined) return 0;
+            return Math.round(value * 100) / 100;
+        };
 
 		$scope.fixDate = function(obj) {
 			if (obj.expense.value >= 0) {
@@ -149,46 +225,6 @@
 			} else {
                 obj.expense.value = 0;
 			}
-		};
-
-
-
-
-		$scope.updateFullParticipation = function() {
-            var account = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
-            account.meta.fullParticipation = 0;
-
-			account.participants.forEach(function(item, i, arr) {
-                account.meta.fullParticipation += item.meta.participation;
-			});
-		};
-
-		$scope.updateShare = function(participantIndex, expenseIndex) {
-            var account = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
-
-            account.participants.forEach(function(item, i, arr) {
-                // item.participationList[][]
-                // item.expenses.forEach(function(item2, i, arr) {
-                	//
-				// });
-			});
-        };
-
-		$scope.getShare = function(participantIndex, expenseIndex) {
-            // {{participant.participationList[participantIndex][expenseIndex].value}} *
-            // {{participant.meta.participation}} *
-            // {{account.participants[participantIndex].expenses[expenseIndex].value}} *
-            // {{expCalc.settings.currencies.rates[accountCurrency][account.participants[participantIndex].expenses[expenseIndex].currency]}} /
-			// fullParticipation
-		};
-
-		$scope.updateCalculation= function(value) {
-			// console.log(value);
-		};
-
-		$scope.roundOff = function(value) {
-			if (value === undefined) return 0;
-			return Math.round(value * 100) / 100;
 		};
 
 		$scope.formatDate = function(value) {
@@ -203,50 +239,6 @@
 
 
 
-
-		$scope.removeAccount = function(obj) {
-			$scope.expCalc.accounts.splice(obj.$index, 1);
-		};
-
-		$scope.removeParticipant = function(obj) {
-			var accountIndex = obj.$parent.$parent.$index;
-			var participantIndex = obj.$index;
-
-			$scope.expCalc.accounts[accountIndex].participants.splice(participantIndex, 1);
-			$scope.removeParticipantFromPartList($scope.expCalc.accounts[accountIndex], participantIndex);
-
-            // $scope.removeArrayFromParticipationLists(accountIndex, participantIndex);
-            // $scope.updateFullParticipation();
-		};
-
-		$scope.removeExpense = function(obj) {
-			var accountIndex = obj.$parent.$parent.$parent.$index;
-			var participantIndex = obj.$parent.$index;
-			var expenseIndex = obj.$index;
-
-			$scope.expCalc.accounts[accountIndex].participants[participantIndex].expenses.splice(expenseIndex, 1);
-			// $scope.removeValueFromParticipationLists(accountIndex, participantIndex, expenseIndex);
-		};
-
-        $scope.removeParticipantFromPartList = function(account, participantIndex) {
-            account.participants.forEach(function(participant, i, arr) {
-                participant.expenses.forEach(function(expense, i, arr) {
-                    expense.partList.splice(participantIndex, 1);
-				});
-			});
-        };
-
-		$scope.removeArrayFromParticipationLists = function(accountIndex, participantIndex) {
-			$scope.expCalc.accounts[accountIndex].participants.forEach(function(item, i, arr) {
-				item.participationList.splice(participantIndex, 1);
-			});
-		};
-
-		$scope.removeValueFromParticipationLists = function(accountIndex, participantIndex, expenseIndex) {
-			$scope.expCalc.accounts[accountIndex].participants.forEach(function(item, i, arr) {
-				item.participationList[participantIndex].splice(expenseIndex, 1);
-			});
-		};
 
 
 
@@ -272,6 +264,8 @@
 				});
 			});
 		}, true);
+
+
 
 		console.log($scope);
 
