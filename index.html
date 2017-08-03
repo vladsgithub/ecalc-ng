@@ -58,7 +58,6 @@
 					<ul class="participants">
 						<li class="padding5-0" ng-repeat="participant in account.participants track by $index">
 							<div class="flex padding5-0 bg">
-								<div class="nowrap">{{$index}}</div>
 								<div>
 									<button class="btn btn-danger" ng-click="removeParticipant(this)">
 										<i class="fa fa-minus"></i>
@@ -83,7 +82,6 @@
 									</div>
 
 									<div class="flex">
-										<div class="nowrap">{{$index}}</div>
 										<div>
 											<button class="btn btn-danger" ng-click="removeExpense(this)">
 												<i class="fa fa-minus"></i>
@@ -141,8 +139,11 @@
 					<h5 class="margin5-0">Шаг 2: Расчет на каждого участника</h5>
 					<h5 class="margin5-0 flex">
 						<span class="flex-grow1">Весь возврат:</span>
-						<span>
-							<b>???</b>
+						<span class="text-uppercase">
+							<b>
+								{{roundOff(getFullRefund(account))}}
+								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+							</b>
 						</span>
 					</h5>
 					<h5 class="margin5-0 warning clearfix">
@@ -174,7 +175,6 @@
 						<li class="padding5-0" ng-repeat="extParticipant in account.participants track by $index"
 							ng-init="extParticipantIndex = $index">
 							<div class="flex padding5-0 bg">
-								<div class="nowrap">{{extParticipantIndex}}</div>
 								<div class="flex-grow1">
 									<h5 class="nowrap">{{extParticipant.meta.title}}</h5>
 								</div>
@@ -187,7 +187,10 @@
 							<div class="flex padding5-0 bg">
 								<div class="balance">
 									<h5>Баланс</h5>
-									<h5>???</h5>
+									<h5 class="text-uppercase">
+										{{roundOff(getBalance(extParticipant))}}
+										{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+									</h5>
 								</div>
 								<div class="share">
 									<h5>Доля</h5>
@@ -231,10 +234,47 @@
 					</ul>
 				</li>
 
-				<li>
+				<li class="step3">
 					<!--=========== STEP 3 ============-->
-					<h5>Step 3</h5>
+					<h5 class="margin5-0">Шаг 3: Фиксация расходов</h5>
+					<h5 class="margin5-0 flex">
+						<span class="flex-grow1">Весь возврат:</span>
+						<span class="text-uppercase">
+							<b>
+								{{roundOff(getFullRefund(account))}}
+								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+							</b>
+						</span>
+					</h5>
 
+
+					<div class="fixation-directly" ng-if="account.settings.fixationDirectly">
+
+						<ul class="participants">
+							<li class="padding5-0" ng-repeat="participant in account.participants track by $index">
+								<div class="padding5-0 bg">
+									<h5 class="nowrap">{{participant.meta.title}}</h5>
+								</div>
+
+								<h5 class="margin5-0 flex">
+									<span class="flex-grow1">
+										Вернет/Получит (<span class="text-uppercase">{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}</span>):
+									</span>
+									<span class="text-uppercase">
+										<b>
+											{{roundOff(participant.meta.balance)}}
+										</b>
+									</span>
+								</h5>
+							</li>
+						</ul>
+
+					</div>
+
+
+					<div class="fixation-by-bank" ng-if="!account.settings.fixationDirectly">
+						<!-- Fixation by bank -->
+					</div>
 				</li>
 			</ul>
 		</li>

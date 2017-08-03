@@ -164,6 +164,15 @@ header {
 .step2 .participants > li {
  border-top: 5px solid #bdaf00;
 }
+.step3 {
+	background: #ffe1df;
+}
+.step3 .bg {
+	background: #f3ad9c;
+}
+.step3 .participants > li {
+	border-top: 5px solid #bd0600;
+}
 .expenses {
 	padding-left: 20px;
 }
