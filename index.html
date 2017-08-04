@@ -93,7 +93,7 @@
 										<div>
 											<select class="form-control" ng-model="expense.type">
 												<option ng-repeat="expensesType in expCalc.settings.expensesTypes track by $index"
-														value="{{$index}}" ng-selected="expense.type == '$index'">
+														value="{{$index}}" ng-selected="expense.type == $index">
 													{{expensesType.name}}
 												</option>
 											</select>
@@ -207,7 +207,7 @@
 									{{intParticipant.meta.title}}<br/>
 
 									<ul class="part-list">
-										<li class="padding5-0" ng-repeat="expense in intParticipant.expenses track by $index">
+										<li class="padding5-0 clearfix" ng-repeat="expense in intParticipant.expenses track by $index">
 											<label>
 												<input type="checkbox" ng-model="expense.partList[extParticipantIndex]">
 												{{expense.title}}
@@ -254,18 +254,20 @@
 							<li class="padding5-0" ng-repeat="participant in account.participants track by $index">
 								<div class="padding5-0 bg">
 									<h5 class="nowrap">{{participant.meta.title}}</h5>
+
+									<h5 class="margin5-0 flex">
+										<span class="flex-grow1">
+											Вернет/Получит (<span class="text-uppercase">{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}</span>):
+										</span>
+										<span class="text-uppercase">
+											<b>
+												{{roundOff(participant.meta.balance)}}
+											</b>
+										</span>
+									</h5>
 								</div>
 
-								<h5 class="margin5-0 flex">
-									<span class="flex-grow1">
-										Вернет/Получит (<span class="text-uppercase">{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}</span>):
-									</span>
-									<span class="text-uppercase">
-										<b>
-											{{roundOff(participant.meta.balance)}}
-										</b>
-									</span>
-								</h5>
+								<ul></ul>
 							</li>
 						</ul>
 
@@ -280,7 +282,6 @@
 		</li>
 	</ul>
 
-	<div style="display: none;">{{expCalc}}</div>
 	<div id="testing" class="testing"></div>
 </main>
 

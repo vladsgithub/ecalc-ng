@@ -45,7 +45,10 @@
                 expenses: [],
                 fixation: {
                     total: 0,
-                    whom: [], // it will be added objects: { to: participants[x], value: 1, reserve: null, date: null}
+                    whom: {
+                        fixed: [], // true or false - if a refund is fixed by number in an array
+                        participants: [] // {number, value, date, reserve}
+                    },
                     byBank: [] // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
                 }
             };
@@ -58,7 +61,7 @@
 
 
 
-        
+
 
         // METHODS OF REMOVING ===============================
         $scope.removeAccount = function (obj) {
