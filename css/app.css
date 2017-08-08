@@ -184,10 +184,13 @@ header {
 	font-size: 1.1rem;
 	text-align: center;
 }
-.expenses .currency select {
+.currency-select {
 	padding: 0;
-	min-width: 60px;
+	width: 60px;
 	text-transform: uppercase;
+}
+.participant-select {
+	width: 120px;
 }
 .step1 .participants > li:last-child,
 .expenses > li:last-child,

@@ -107,7 +107,7 @@
 												   ng-model="expense.value" ng-change="fixDate(this)">
 										</div>
 										<div class="currency">
-											<select class="form-control" ng-model="expense.currency"
+											<select class="form-control currency-select" ng-model="expense.currency"
 													ng-options="key as value for (key, value) in expCalc.settings.currencies.names"
 													ng-change="fixDate(this)">
 											</select>
@@ -238,10 +238,10 @@
 					<!--=========== STEP 3 ============-->
 					<h5 class="margin5-0">Шаг 3: Фиксация расходов</h5>
 					<h5 class="margin5-0 flex">
-						<span class="flex-grow1">Весь возврат:</span>
+						<span class="flex-grow1">Баланс расчётов:</span>
 						<span class="text-uppercase">
 							<b>
-								{{roundOff(getFullRefund(account))}}
+								{{roundOff(account.meta.fullRefund)}}
 								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
 							</b>
 						</span>
@@ -265,9 +265,50 @@
 											</b>
 										</span>
 									</h5>
+
+									<h5>Следующему участнику:</h5>
 								</div>
 
-								<ul></ul>
+								<ul class="part-list" ng-if="participant.meta.balance < 0">
+									<li>
+
+									</li>
+
+									<li class="bg choose-sponsor">
+
+										<div class="flex">
+											<div>
+												<select class="form-control" style="min-width: 130px;">
+													<option value="" hidden disabled selected>Выберите участника</option>
+													<option ng-repeat="sponsor in account.participants track by $index"
+															value="{{$index}}" ng-if="sponsor.meta.balance > 0">
+														{{sponsor.meta.title}} [BYN {{sponsor.meta.balance}}]
+													</option>
+												</select>
+											</div>
+											<div class="flex-grow1">
+												<input type="text" class="form-control">
+											</div>
+											<div>
+												<select class="form-control currency-select">
+													<option value="" hidden disabled selected>- - -</option>
+													<option ng-repeat="currency in expCalc.settings.currencies.names track by $index"
+															value="{{$index}}">
+														{{currency}}
+													</option>
+												</select>
+											</div>
+											<div>
+												<input type="checkbox">
+											</div>
+										</div>
+
+									</li>
+
+									<li class="bg reserve">
+
+									</li>
+								</ul>
 							</li>
 						</ul>
 

@@ -44,11 +44,7 @@
                 },
                 expenses: [],
                 fixation: {
-                    total: 0,
-                    whom: {
-                        fixed: [], // true or false - if a refund is fixed by number in an array
-                        participants: [] // {number, value, date, reserve}
-                    },
+                    whom: [], // {number, value, currency, date, reserve}
                     byBank: [] // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
                 }
             };
@@ -208,7 +204,7 @@
             var shareTotal = 0;
 
             account.participants.forEach(function (participant, i, arr) {
-                shareTotal += $scope.getParticipantShare(account, i);
+                shareTotal += account.participants[i].meta.share;
             });
 
             return shareTotal;
@@ -224,6 +220,8 @@
 
             account.meta.fullRefund = fullRefund;
 
+            $scope.updateParticipantsFixation(account);
+
             return fullRefund;
         };
 
@@ -236,6 +234,20 @@
 
 
 
+        $scope.updateParticipantsFixation = function(account) {
+            // var remainingRefund = account.meta.fullRefund,
+            //     debtors = [],
+            //     sponsors = [];
+            //
+            // account.participants.forEach(function(participant, i, arr) {
+            //     if (participant.meta.balance > 0 && participant) {
+            //
+            //     }
+            //     if (participant.meta.balance < 0) {
+            //
+            //     }
+            // })
+        };
 
 
 
