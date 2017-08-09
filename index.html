@@ -78,7 +78,7 @@
 								<li class="padding5-0 bg" ng-repeat="expense in participant.expenses track by $index">
 
 									<div class="test-block">
-										expenseWithRate = {{getExpenseWithRate(account, expense)}}
+										expenseWithRate = {{getExpenseWithRate(expense)}}
 									</div>
 
 									<div class="flex">
@@ -216,7 +216,7 @@
 													<!-- partList[] * participation * expense / partSumOfExpense -->
 													{{expense.partList[extParticipantIndex]}} *
 													{{extParticipant.meta.participation}} *
-													{{getExpenseWithRate(account, expense)}} /
+													{{getExpenseWithRate(expense)}} /
 													{{getPartSumOfExpense(account, expense)}} =
 												</div>
 											</label>
@@ -278,19 +278,21 @@
 
 										<div class="flex">
 											<div>
-												<select class="form-control" style="min-width: 130px;">
+												<select class="form-control" style="min-width: 130px;"
+														ng-model="participant.fixation.tempWhom.number"
+														ng-change="getTempWhomObject(account, participant)">
 													<option value="" hidden disabled selected>Выберите участника</option>
 													<option ng-repeat="sponsor in account.participants track by $index"
 															value="{{$index}}" ng-if="sponsor.meta.balance > 0">
-														{{sponsor.meta.title}} [BYN {{sponsor.meta.balance}}]
+														{{sponsor.meta.title}} - [BYN {{roundOff(sponsor.meta.balance)}}]
 													</option>
 												</select>
 											</div>
 											<div class="flex-grow1">
-												<input type="text" class="form-control">
+												<input type="text" class="form-control" ng-model="participant.fixation.tempWhom.value">
 											</div>
 											<div>
-												<select class="form-control currency-select">
+												<select class="form-control currency-select" ng-model="participant.fixation.tempWhom.currency">
 													<option value="" hidden disabled selected>- - -</option>
 													<option ng-repeat="currency in expCalc.settings.currencies.names track by $index"
 															value="{{$index}}">
@@ -323,7 +325,10 @@
 		</li>
 	</ul>
 
+
+
 	<div id="testing" class="testing"></div>
+	<div>{{expCalc}}</div>
 </main>
 
 </body>

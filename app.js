@@ -44,6 +44,13 @@
                 },
                 expenses: [],
                 fixation: {
+                    tempWhom: {
+                        number: null,
+                        value: null,
+                        currency: null,
+                        date: null,
+                        reserve: null
+                    }, // it will be moved up into the whom array
                     whom: [], // {number, value, currency, date, reserve}
                     byBank: [] // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
                 }
@@ -161,10 +168,15 @@
             return participant.meta.total;
         };
 
-        $scope.getExpenseWithRate = function (account, expense) {
-            var rate = $scope.expCalc.settings.currencies.rates[account.settings.accountCurrency][expense.currency];
+        $scope.getMoneyByAccountCurrency = function (value, exchangeCurrency) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                rate = $scope.expCalc.settings.currencies.rates[currentAccount.settings.accountCurrency][exchangeCurrency];
 
-            return expense.value * rate;
+            return value * rate;
+        };
+
+        $scope.getExpenseWithRate = function (expense) {
+            return $scope.getMoneyByAccountCurrency(expense.value, expense.currency);
         };
 
         $scope.getPartSumOfExpense = function (account, expense) {
@@ -182,7 +194,7 @@
         $scope.getExpenseShare = function (account, expense, extParticipantIndex) {
             return expense.partList[extParticipantIndex] *
                 account.participants[extParticipantIndex].meta.participation *
-                $scope.getExpenseWithRate(account, expense) /
+                $scope.getExpenseWithRate(expense) /
                 $scope.getPartSumOfExpense(account, expense);
         };
 
@@ -220,8 +232,6 @@
 
             account.meta.fullRefund = fullRefund;
 
-            $scope.updateParticipantsFixation(account);
-
             return fullRefund;
         };
 
@@ -231,22 +241,13 @@
             return participant.meta.balance;
         };
 
+        $scope.getTempWhomObject = function(account, debtor) {
+            var tempWhom = debtor.fixation.tempWhom,
+                sponsor = account.participants[tempWhom.number],
+                debt = $scope.getMoneyByAccountCurrency(-debtor.meta.balance, sponsor.meta.preferredCurrency);
 
-
-
-        $scope.updateParticipantsFixation = function(account) {
-            // var remainingRefund = account.meta.fullRefund,
-            //     debtors = [],
-            //     sponsors = [];
-            //
-            // account.participants.forEach(function(participant, i, arr) {
-            //     if (participant.meta.balance > 0 && participant) {
-            //
-            //     }
-            //     if (participant.meta.balance < 0) {
-            //
-            //     }
-            // })
+            tempWhom.value = $scope.roundOff((sponsor.meta.balance - debt < 0) ? sponsor.meta.balance : debt);
+            tempWhom.currency = sponsor.meta.preferredCurrency;
         };
 
 
@@ -302,7 +303,11 @@
 
         console.log($scope);
 
-        $scope.expCalc = getDataService;
+        if (false) {
+            $scope.expCalc = getDataService;
+        } else {
+            $scope.expCalc = {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,0.8971,59.8981,1.927],[null,1,null,null],[null,null,1,null],[1.933,2.158,0.0324,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет","total":6,"fullRefund":-1.9000000000000001},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"3","total":2,"share":0.8,"balance":1.2},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Wed Aug 09 2017 10:46:17 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[false,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":1,"share":2.6,"balance":-1.6},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Wed Aug 09 2017 10:46:21 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"3","total":2,"share":1.3,"balance":0.7},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Wed Aug 09 2017 10:46:23 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":1,"share":1.3,"balance":-0.30000000000000004},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Wed Aug 09 2017 10:46:27 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null},"whom":[],"byBank":[]}}],"sponsors":[]}]}
+        }
         if (!$scope.expCalc.accounts.length) $scope.createAccount();
     }];
 
