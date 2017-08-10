@@ -49,7 +49,8 @@
                         value: null,
                         currency: null,
                         date: null,
-                        reserve: null
+                        reserve: null,
+                        checked: false
                     }, // it will be moved up into the whom array
                     whom: [], // {number, value, currency, date, reserve}
                     byBank: [] // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
@@ -267,15 +268,30 @@
         };
 
         $scope.fixRefund = function (participant) {
+            if (participant.fixation.tempWhom.number === null) {
+                participant.fixation.tempWhom.checked = false;
+                return;
+            }
+
+            var whomItem = {
+                number: participant.fixation.tempWhom.number,
+                value: participant.fixation.tempWhom.value,
+                currency: participant.fixation.tempWhom.currency,
+                date: participant.fixation.tempWhom.date,
+                reserve: participant.fixation.tempWhom.reserve,
+                checked: true
+            };
+
             participant.fixation.tempWhom.date = '' + new Date();
-            participant.fixation.whom.push(participant.fixation.tempWhom);
+            participant.fixation.whom.push(whomItem);
 
             participant.fixation.tempWhom = {
                 number: null,
                 value: null,
                 currency: null,
                 date: null,
-                reserve: null
+                reserve: null,
+                checked: false
             };
         };
 
@@ -319,7 +335,7 @@
         if (false) {
             $scope.expCalc = getDataService;
         } else {
-            $scope.expCalc = {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,0.8971,59.8981,1.927],[null,1,null,null],[null,null,1,null],[1.933,2.158,0.0324,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет","total":6,"fullRefund":-1.9000000000000001},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"3","total":2,"share":0.8,"balance":1.2},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Wed Aug 09 2017 10:46:17 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[false,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":1,"share":2.6,"balance":-1.6},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Wed Aug 09 2017 10:46:21 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"3","total":2,"share":1.3,"balance":0.7},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Wed Aug 09 2017 10:46:23 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":1,"share":1.3,"balance":-0.30000000000000004},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Wed Aug 09 2017 10:46:27 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null},"whom":[],"byBank":[]}}],"sponsors":[]}]}
+            $scope.expCalc = {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,0.8971,59.8981,1.927],[null,1,null,null],[null,null,1,null],[1.933,2.158,0.0324,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет","total":6,"fullRefund":-1.9000000000000001},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"3","total":2,"share":0.8,"balance":1.2},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Thu Aug 10 2017 18:03:33 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[false,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null,"checked":false},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":1,"share":2.6,"balance":-1.6},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Thu Aug 10 2017 18:03:35 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null,"checked":false},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"3","total":2,"share":1.3,"balance":0.7},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Thu Aug 10 2017 18:03:36 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null,"checked":false},"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":1,"share":1.3,"balance":-0.30000000000000004},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Thu Aug 10 2017 18:03:39 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"tempWhom":{"number":null,"value":null,"currency":null,"date":null,"reserve":null,"checked":false},"whom":[],"byBank":[]}}],"sponsors":[]}]}
         }
         if (!$scope.expCalc.accounts.length) $scope.createAccount();
     }];

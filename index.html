@@ -270,7 +270,7 @@
 								</div>
 
 								<ul class="part-list" ng-if="participant.meta.balance < 0">
-									<li class="bg it-was-returned" ng-repeat="refund in participant.fixation.whom">
+									<li class="bg padding5-0 it-was-returned" ng-repeat="refund in participant.fixation.whom">
 
 										<div class="flex">
 											<div style="min-width: 140px;">
@@ -290,14 +290,14 @@
 											</div>
 										</div>
 
-										<div>
-											reserve
+										<div ng-if="refund.reserve > 0">
+											В резерве: {{refund.reserve}}
 										</div>
 
 									</li>
 
 
-									<li class="bg choose-sponsor">
+									<li class="bg padding5-0 choose-sponsor">
 
 										<div class="flex">
 											<div>
