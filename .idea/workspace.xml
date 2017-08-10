@@ -21,8 +21,8 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="379">
-              <caret line="249" column="63" lean-forward="false" selection-start-line="249" selection-start-column="63" selection-end-line="249" selection-end-column="63" />
+            <state relative-caret-position="433">
+              <caret line="267" column="0" lean-forward="true" selection-start-line="267" selection-start-column="0" selection-end-line="267" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -31,9 +31,10 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="563">
-              <caret line="294" column="141" lean-forward="false" selection-start-line="294" selection-start-column="141" selection-end-line="294" selection-end-column="141" />
+            <state relative-caret-position="623">
+              <caret line="288" column="95" lean-forward="false" selection-start-line="288" selection-start-column="95" selection-end-line="288" selection-end-column="95" />
               <folding>
+                <element signature="n#style#0;n#div#0;n#div#0;n#li#0;n#ul#0;n#li#0;n#ul#0;n#div#0;n#li#2;n#ul#0;n#li#0;n#ul#0;n#main#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#select#0;n#div#0;n#div#0;n#li#1;n#ul#0;n#li#0;n#ul#0;n#div#0;n#li#2;n#ul#0;n#li#0;n#ul#0;n#main#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
             </state>
@@ -62,8 +63,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>updateShare</find>
-      <find>updateCalculation</find>
       <find>removeParticipantFromPartList</find>
       <find>removeArrayFromParticipationLists</find>
       <find>CONSOLE</find>
@@ -90,8 +89,10 @@
       <find>ng-option</find>
       <find>updateParticipantsFixation</find>
       <find>testing</find>
-      <find>expCalc</find>
       <find>getExpenseWithRate</find>
+      <find>expCalc</find>
+      <find>fixRefund</find>
+      <find>flex padding5-0</find>
     </findStrings>
     <replaceStrings>
       <replace>'</replace>
@@ -254,12 +255,12 @@
       <updated>1497954736834</updated>
       <workItem from="1497954738177" duration="5781000" />
       <workItem from="1498579966968" duration="38510000" />
-      <workItem from="1500971756839" duration="107146000" />
+      <workItem from="1500971756839" duration="111675000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="151437000" />
+    <option name="totallyTimeSpent" value="155966000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -316,6 +317,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
+            <element signature="n#style#0;n#div#0;n#div#0;n#li#0;n#ul#0;n#li#0;n#ul#0;n#div#0;n#li#2;n#ul#0;n#li#0;n#ul#0;n#main#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#select#0;n#div#0;n#div#0;n#li#1;n#ul#0;n#li#0;n#ul#0;n#div#0;n#li#2;n#ul#0;n#li#0;n#ul#0;n#main#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
         </state>
@@ -334,6 +336,7 @@
         <state relative-caret-position="260">
           <caret line="13" column="35" lean-forward="false" selection-start-line="13" selection-start-column="35" selection-end-line="13" selection-end-column="35" />
           <folding>
+            <element signature="n#style#0;n#div#0;n#div#0;n#li#0;n#ul#0;n#li#0;n#ul#0;n#div#0;n#li#2;n#ul#0;n#li#0;n#ul#0;n#main#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#select#0;n#div#0;n#div#0;n#li#1;n#ul#0;n#li#0;n#ul#0;n#div#0;n#li#2;n#ul#0;n#li#0;n#ul#0;n#main#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
         </state>
@@ -357,17 +360,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="379">
-          <caret line="249" column="63" lean-forward="false" selection-start-line="249" selection-start-column="63" selection-end-line="249" selection-end-column="63" />
+        <state relative-caret-position="433">
+          <caret line="267" column="0" lean-forward="true" selection-start-line="267" selection-start-column="0" selection-end-line="267" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="563">
-          <caret line="294" column="141" lean-forward="false" selection-start-line="294" selection-start-column="141" selection-end-line="294" selection-end-column="141" />
+        <state relative-caret-position="623">
+          <caret line="288" column="95" lean-forward="false" selection-start-line="288" selection-start-column="95" selection-end-line="288" selection-end-column="95" />
           <folding>
+            <element signature="n#style#0;n#div#0;n#div#0;n#li#0;n#ul#0;n#li#0;n#ul#0;n#div#0;n#li#2;n#ul#0;n#li#0;n#ul#0;n#main#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#select#0;n#div#0;n#div#0;n#li#1;n#ul#0;n#li#0;n#ul#0;n#div#0;n#li#2;n#ul#0;n#li#0;n#ul#0;n#main#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
         </state>

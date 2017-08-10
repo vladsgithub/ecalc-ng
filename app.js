@@ -266,6 +266,19 @@
             }
         };
 
+        $scope.fixRefund = function (participant) {
+            participant.fixation.tempWhom.date = '' + new Date();
+            participant.fixation.whom.push(participant.fixation.tempWhom);
+
+            participant.fixation.tempWhom = {
+                number: null,
+                value: null,
+                currency: null,
+                date: null,
+                reserve: null
+            };
+        };
+
         $scope.formatDate = function (value) {
             if (value) {
                 value = new Date(value);
