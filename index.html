@@ -251,7 +251,9 @@
 					<div class="fixation-directly" ng-if="account.settings.fixationDirectly">
 
 						<ul class="participants">
-							<li class="padding5-0" ng-repeat="participant in account.participants track by $index">
+							<li class="padding5-0" ng-repeat="participant in account.participants track by $index"
+								ng-init="participantIndex = $index">
+
 								<div class="padding5-0 bg">
 									<h5 class="nowrap">{{participant.meta.title}}</h5>
 
@@ -262,6 +264,7 @@
 										<span class="text-uppercase">
 											<b>
 												{{roundOff(participant.meta.balance)}}
+												({{participant.meta.receivedSum}})
 											</b>
 										</span>
 									</h5>
@@ -270,52 +273,37 @@
 								</div>
 
 								<ul class="part-list" ng-if="participant.meta.balance < 0">
-									<li class="bg padding5-0 it-was-returned" ng-repeat="refund in participant.fixation.whom">
-
-										<div class="flex">
-											<div style="min-width: 140px;">
-												<div>{{account.participants[refund.number].meta.title}}</div>
-												<div class="small">{{formatDate(refund.date)}}</div>
-											</div>
-											<div class="flex-grow1">
-												<input type="text" disabled class="form-control"
-													   ng-model="refund.value">
-											</div>
-											<div>
-												<input type="text" disabled class="form-control"
-													   ng-model="refund.currency">
-											</div>
-											<div>
-												<input type="checkbox" ng-model="refund.checked">
-											</div>
-										</div>
-
-										<div ng-if="refund.reserve > 0">
-											В резерве: {{refund.reserve}}
-										</div>
-
-									</li>
-
-
-									<li class="bg padding5-0 choose-sponsor">
+									<li class="bg padding5-0 it-was-returned"
+										ng-repeat="refund in participant.fixation.whom track by $index"
+										ng-init="refundIndex = $index">
 
 										<div class="flex">
 											<div>
 												<select class="form-control" style="min-width: 130px;"
-														ng-model="participant.fixation.tempWhom.number"
-														ng-change="getTempWhomObject(account, participant)">
+														ng-disabled="refund.checked"
+														ng-model="refund.number"
+														ng-change="fillRefundFields(account, participant, refund, refundIndex)">
 													<option value="" hidden disabled selected>Выберите участника</option>
+
 													<option ng-repeat="sponsor in account.participants track by $index"
-															value="{{$index}}" ng-if="sponsor.meta.balance > 0">
+															value="{{$index}}" ng-if="participantIndex != $index">
 														{{sponsor.meta.title}} - [BYN {{roundOff(sponsor.meta.balance)}}]
+													</option>
+
+													<option value="-1" ng-if="refundIndex + 1 != participant.fixation.whom.length">
+														Удалить этот возврат
 													</option>
 												</select>
 											</div>
 											<div class="flex-grow1">
-												<input type="text" class="form-control" ng-model="participant.fixation.tempWhom.value">
+												<input type="text" class="form-control"
+													   ng-disabled="refund.checked"
+													   ng-model="refund.value">
 											</div>
 											<div>
-												<select class="form-control currency-select" ng-model="participant.fixation.tempWhom.currency">
+												<select class="form-control currency-select"
+														ng-disabled="refund.checked"
+														ng-model="refund.currency">
 													<option value="" hidden disabled selected>- - -</option>
 													<option ng-repeat="currency in expCalc.settings.currencies.names track by $index"
 															value="{{$index}}">
@@ -324,17 +312,18 @@
 												</select>
 											</div>
 											<div>
-												<input type="checkbox" ng-model="participant.fixation.tempWhom.checked"
-													   ng-change="fixRefund(participant)">
+												<input type="checkbox" ng-model="refund.checked"
+													   ng-change="fixRefund(participant, refund, refundIndex)">
 											</div>
 										</div>
 
-									</li>
-
-									<li class="bg reserve">
+										<div ng-if="refund.reserve > 0">
+											В резерве: {{refund.reserve}}
+										</div>
 
 									</li>
 								</ul>
+
 							</li>
 						</ul>
 
