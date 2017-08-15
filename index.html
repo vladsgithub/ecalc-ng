@@ -236,9 +236,9 @@
 
 				<li class="step3">
 					<!--=========== STEP 3 ============-->
-					<h5 class="margin5-0">Шаг 3: Фиксация расходов</h5>
+					<h5 class="margin5-0">Шаг 3: Фиксация возвратов</h5>
 					<h5 class="margin5-0 flex">
-						<span class="flex-grow1">Баланс расчётов:</span>
+						<span class="flex-grow1">Баланс возвратов:</span>
 						<span class="text-uppercase">
 							<b>
 								{{roundOff(account.meta.fullRefund)}}
@@ -259,61 +259,57 @@
 
 									<h5 class="margin5-0 flex">
 										<span class="flex-grow1">
-											Вернет/Получит (<span class="text-uppercase">{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}</span>):
+											<span ng-if="participant.meta.balance < 0">Вернет</span>
+											<span ng-if="participant.meta.balance >= 0">Получит</span>
+											(<span class="text-uppercase">{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}</span>):
 										</span>
 										<span class="text-uppercase">
 											<b>
 												{{roundOff(participant.meta.balance)}}
-												({{participant.meta.receivedSum}})
+												({{roundOff(participant.meta.receivedSum)}})
 											</b>
 										</span>
 									</h5>
-
-									<h5>Следующему участнику:</h5>
 								</div>
 
-								<ul class="part-list" ng-if="participant.meta.balance < 0">
+								<ul class="part-list">
 									<li class="bg padding5-0 it-was-returned"
 										ng-repeat="refund in participant.fixation.whom track by $index"
 										ng-init="refundIndex = $index">
 
 										<div class="flex">
 											<div>
-												<select class="form-control" style="min-width: 130px;"
-														ng-disabled="refund.checked"
+												<button class="btn btn-danger" ng-click="removePayment(account, participant, refund, refundIndex)">
+													<i class="fa fa-minus"></i>
+												</button>
+											</div>
+											<div>
+												<select class="form-control paddingD-0" style="min-width: 110px;"
 														ng-model="refund.number"
 														ng-change="fillRefundFields(account, participant, refund, refundIndex)">
 													<option value="" hidden disabled selected>Выберите участника</option>
 
 													<option ng-repeat="sponsor in account.participants track by $index"
 															value="{{$index}}" ng-if="participantIndex != $index">
-														{{sponsor.meta.title}} - [BYN {{roundOff(sponsor.meta.balance)}}]
-													</option>
-
-													<option value="-1" ng-if="refundIndex + 1 != participant.fixation.whom.length">
-														Удалить этот возврат
+														{{getParticipantOption(participant.meta.balance, sponsor.meta)}}
 													</option>
 												</select>
 											</div>
 											<div class="flex-grow1">
-												<input type="text" class="form-control"
-													   ng-disabled="refund.checked"
-													   ng-model="refund.value">
+												<input type="text" class="form-control" placeholder="сумма"
+													   ng-model="refund.value"
+													   ng-change="acceptRefund(participant, refund, refundIndex)">
 											</div>
 											<div>
 												<select class="form-control currency-select"
-														ng-disabled="refund.checked"
-														ng-model="refund.currency">
+														ng-model="refund.currency"
+														ng-change="acceptRefund(participant, refund, refundIndex)">
 													<option value="" hidden disabled selected>- - -</option>
 													<option ng-repeat="currency in expCalc.settings.currencies.names track by $index"
 															value="{{$index}}">
 														{{currency}}
 													</option>
 												</select>
-											</div>
-											<div>
-												<input type="checkbox" ng-model="refund.checked"
-													   ng-change="fixRefund(participant, refund, refundIndex)">
 											</div>
 										</div>
 
@@ -322,7 +318,66 @@
 										</div>
 
 									</li>
+
+									<li class="bg padding5-0">
+										<button class="btn btn-primary" ng-click="addNewPayment(participant)">
+											<i class="fa fa-plus"></i>
+										</button>
+										Сделать новый взнос
+									</li>
 								</ul>
+
+								<!--<ul class="part-list" ng-if="participant.meta.balance < 0">-->
+									<!--<li class="bg padding5-0 it-was-returned"-->
+										<!--ng-repeat="refund in participant.fixation.whom track by $index"-->
+										<!--ng-init="refundIndex = $index">-->
+
+										<!--<div class="flex">-->
+											<!--<div>-->
+												<!--<select class="form-control" style="min-width: 130px;"-->
+														<!--ng-disabled="refund.checked"-->
+														<!--ng-model="refund.number"-->
+														<!--ng-change="fillRefundFields(account, participant, refund, refundIndex)">-->
+													<!--<option value="" hidden disabled selected>Выберите участника</option>-->
+
+													<!--<option ng-repeat="sponsor in account.participants track by $index"-->
+															<!--value="{{$index}}" ng-if="participantIndex != $index">-->
+														<!--{{sponsor.meta.title}} - [BYN {{roundOff(sponsor.meta.balance)}}]-->
+													<!--</option>-->
+
+													<!--<option value="-1" ng-if="refundIndex + 1 != participant.fixation.whom.length">-->
+														<!--Удалить этот возврат-->
+													<!--</option>-->
+												<!--</select>-->
+											<!--</div>-->
+											<!--<div class="flex-grow1">-->
+												<!--<input type="text" class="form-control"-->
+													   <!--ng-disabled="refund.checked"-->
+													   <!--ng-model="refund.value">-->
+											<!--</div>-->
+											<!--<div>-->
+												<!--<select class="form-control currency-select"-->
+														<!--ng-disabled="refund.checked"-->
+														<!--ng-model="refund.currency">-->
+													<!--<option value="" hidden disabled selected>- - -</option>-->
+													<!--<option ng-repeat="currency in expCalc.settings.currencies.names track by $index"-->
+															<!--value="{{$index}}">-->
+														<!--{{currency}}-->
+													<!--</option>-->
+												<!--</select>-->
+											<!--</div>-->
+											<!--<div>-->
+												<!--<input type="checkbox" ng-model="refund.checked"-->
+													   <!--ng-change="fixRefund(participant, refund, refundIndex)">-->
+											<!--</div>-->
+										<!--</div>-->
+
+										<!--<div ng-if="refund.reserve > 0">-->
+											<!--В резерве: {{refund.reserve}}-->
+										<!--</div>-->
+
+									<!--</li>-->
+								<!--</ul>-->
 
 							</li>
 						</ul>

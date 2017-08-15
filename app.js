@@ -45,14 +45,7 @@
                 },
                 expenses: [],
                 fixation: {
-                    whom: [{
-                        number: null,
-                        value: null,
-                        currency: null,
-                        date: null,
-                        reserve: null,
-                        checked: false
-                    }],
+                    whom: [],
                     byBank: [] // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
                 }
             };
@@ -94,6 +87,13 @@
                     expense.partList.splice(participantIndex, 1);
                 });
             });
+        };
+
+        $scope.removePayment = function (account, debtor, refund, refundIndex) {
+            debtor.fixation.whom.splice(refundIndex, 1);
+
+            account.participants[refund.number].meta.receivedSum += refund.value;
+            debtor.meta.receivedSum -= refund.value;
         };
 
 
@@ -138,6 +138,16 @@
                     value: true,
                     share: null
                 });
+            });
+        };
+
+        $scope.addNewPayment = function(participant) {
+            participant.fixation.whom.push({
+                number: null,
+                value: null,
+                currency: null,
+                date: null,
+                reserve: null
             });
         };
 
@@ -242,6 +252,17 @@
             return participant.meta.balance;
         };
 
+        $scope.getParticipantOption = function (participantBalance, sponsorMeta) {
+            var option = sponsorMeta.title;
+
+            if (participantBalance < 0 && sponsorMeta.balance > 0) {
+                option += ' - [BYN ' + $scope.roundOff(sponsorMeta.balance) + ']';
+            }
+
+            return option;
+        };
+
+
 
 
         // OTHER METHODS ===============================
@@ -258,55 +279,76 @@
             }
         };
 
-        $scope.fixRefund = function (participant, refund, refundIndex) {
-            var reserve, currentAccount;
+        $scope.acceptRefund = function (participant, refund, refundIndex) {
+            // console.log('participant=', participant);
+            // console.log('refund=', refund);
+            // console.log('refundIndex=', refundIndex);
 
-            refund.value = $scope.roundOff(refund.value);
+            var currentAccount, reserve;
 
-            if (refund.number === null || !(refund.value > 0) || refund.currency === null) {
-                refund.checked = false;
-                return;
+            if (refund.number !== null && refund.value !== null && refund.currency !== null) {
+
+                // todo: correct receivedSum counting
+                currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+                currentAccount.participants[refund.number].meta.receivedSum -= parseFloat(refund.value);
+                participant.meta.receivedSum += parseFloat(refund.value);
+
+                // reserve = currentAccount.participants[refund.number].meta.balance + currentAccount.participants[refund.number].meta.receivedSum;
+                // refund.reserve = (reserve < 0) ? $scope.roundOff(-reserve) : 0;
+
+                refund.date = '' + new Date();
             }
-
-            currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
-
-            if (participant.fixation.whom.length == refundIndex + 1) {
-                participant.fixation.whom.push({
-                    number: null,
-                    value: null,
-                    currency: null,
-                    date: null,
-                    reserve: null,
-                    checked: false
-                });
-            }
-
-            if (refund.checked) {
-                currentAccount.participants[refund.number].meta.receivedSum -= refund.value;
-                participant.meta.receivedSum += refund.value;
-            } else {
-                currentAccount.participants[refund.number].meta.receivedSum += refund.value;
-                participant.meta.receivedSum -= refund.value;
-            }
-            refund.value = $scope.roundOff(refund.value);
-
-            // todo: to do correct data for reserve
-            reserve = currentAccount.participants[refund.number].meta.balance + currentAccount.participants[refund.number].meta.receivedSum;
-            refund.reserve = (reserve < 0) ? $scope.roundOff(-reserve) : 0;
-
-            refund.date = '' + new Date();
         };
 
+        // $scope.fixRefund = function (participant, refund, refundIndex) {
+        //     var reserve, currentAccount;
+        //
+        //     refund.value = $scope.roundOff(refund.value);
+        //
+        //     if (refund.number === null || !(refund.value > 0) || refund.currency === null) {
+        //         refund.checked = false;
+        //         return;
+        //     }
+        //
+        //     currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+        //
+        //     if (participant.fixation.whom.length == refundIndex + 1) {
+        //         participant.fixation.whom.push({
+        //             number: null,
+        //             value: null,
+        //             currency: null,
+        //             date: null,
+        //             reserve: null,
+        //             checked: false
+        //         });
+        //     }
+        //
+        //     if (refund.checked) {
+        //         currentAccount.participants[refund.number].meta.receivedSum -= refund.value;
+        //         participant.meta.receivedSum += refund.value;
+        //     } else {
+        //         currentAccount.participants[refund.number].meta.receivedSum += refund.value;
+        //         participant.meta.receivedSum -= refund.value;
+        //     }
+        //     refund.value = $scope.roundOff(refund.value);
+        //
+        //     // todo: to do correct data for reserve
+        //     reserve = currentAccount.participants[refund.number].meta.balance + currentAccount.participants[refund.number].meta.receivedSum;
+        //     refund.reserve = (reserve < 0) ? $scope.roundOff(-reserve) : 0;
+        //
+        //     refund.date = '' + new Date();
+        // };
+
         $scope.fillRefundFields = function (account, debtor, refund, refundIndex) {
-            if (refund.number == -1) {
-                debtor.fixation.whom.splice(refundIndex, 1);
-                return;
-            }
-            var sponsor = account.participants[refund.number],
+            var value,
+                sponsor = account.participants[refund.number],
                 debt = $scope.getMoneyByAccountCurrency(-debtor.meta.balance, sponsor.meta.preferredCurrency);
 
-            refund.value = $scope.roundOff((sponsor.meta.balance - debt < 0) ? sponsor.meta.balance : debt);
+            value = $scope.roundOff((sponsor.meta.balance - debt < 0) ? sponsor.meta.balance : debt);
+            refund.value = (value < 0) ? 0 : value;
             refund.currency = sponsor.meta.preferredCurrency;
+
+            $scope.acceptRefund(debtor, refund, refundIndex);
         };
 
         $scope.formatDate = function (value) {
@@ -349,7 +391,7 @@
         if (false) {
             $scope.expCalc = getDataService;
         } else {
-            $scope.expCalc = {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,0.8971,59.8981,1.927],[null,1,null,null],[null,null,1,null],[1.933,2.158,0.0324,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет","total":6,"fullRefund":-1.9000000000000001},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"3","total":2,"share":0.8,"balance":1.2,"receivedSum":0},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Fri Aug 11 2017 13:13:04 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[false,true,true,true]}],"fixation":{"whom":[{"number":null,"value":null,"currency":null,"date":null,"reserve":null,"checked":false}],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":1,"share":2.6,"balance":-1.6,"receivedSum":0},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Fri Aug 11 2017 13:13:07 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[{"number":null,"value":null,"currency":null,"date":null,"reserve":null,"checked":false}],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"3","total":2,"share":1.3,"balance":0.7,"receivedSum":0},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Fri Aug 11 2017 13:13:08 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[{"number":null,"value":null,"currency":null,"date":null,"reserve":null,"checked":false}],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":1,"share":1.3,"balance":-0.30000000000000004,"receivedSum":0},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Fri Aug 11 2017 13:13:09 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[{"number":null,"value":null,"currency":null,"date":null,"reserve":null,"checked":false}],"byBank":[]}}],"sponsors":[]}]}
+            $scope.expCalc = {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,0.8971,59.8981,1.927],[null,1,null,null],[null,null,1,null],[1.933,2.158,0.0324,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет","total":6,"fullRefund":-1.9000000000000001},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"3","total":2,"share":0.8,"balance":1.2,"receivedSum":0},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Tue Aug 15 2017 09:38:13 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[false,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":1,"share":2.6,"balance":-1.6,"receivedSum":0},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Tue Aug 15 2017 09:38:16 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"3","total":2,"share":1.3,"balance":0.7,"receivedSum":0},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Tue Aug 15 2017 09:38:17 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":1,"share":1.3,"balance":-0.30000000000000004,"receivedSum":0},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Tue Aug 15 2017 09:38:20 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}}],"sponsors":[]}]}
         }
         if (!$scope.expCalc.accounts.length) $scope.createAccount();
     }];
