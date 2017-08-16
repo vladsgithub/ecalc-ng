@@ -104,12 +104,11 @@
 										<div class="date">{{formatDate(expense.date)}}</div>
 										<div class="flex-grow1">
 											<input class="form-control" type="number" placeholder="сумма"
-												   ng-model="expense.value" ng-change="fixDate(this)">
+												   ng-model="expense.value">
 										</div>
 										<div class="currency">
 											<select class="form-control currency-select" ng-model="expense.currency"
-													ng-options="key as value for (key, value) in expCalc.settings.currencies.names"
-													ng-change="fixDate(this)">
+													ng-options="key as value for (key, value) in expCalc.settings.currencies.names">
 											</select>
 										</div>
 									</div>
@@ -267,6 +266,7 @@
 											<b>
 												{{roundOff(participant.meta.balance)}}
 												({{getReceivedSum(account, participant, participantIndex)}})
+												[{{getGivenSum(participant)}}]
 											</b>
 										</span>
 									</h5>
@@ -286,7 +286,7 @@
 											<div>
 												<select class="form-control paddingD-0" style="min-width: 110px;"
 														ng-model="refund.number"
-														ng-change="fillRefundFields(account, participant, refund, refundIndex)">
+														ng-change="fillRefundFields(account, participant, refund)">
 													<option value="" hidden disabled selected>Выберите участника</option>
 
 													<option ng-repeat="sponsor in account.participants track by $index"
