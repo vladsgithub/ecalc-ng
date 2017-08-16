@@ -89,11 +89,8 @@
             });
         };
 
-        $scope.removePayment = function (account, debtor, refund, refundIndex) {
+        $scope.removePayment = function (debtor, refundIndex) {
             debtor.fixation.whom.splice(refundIndex, 1);
-
-            account.participants[refund.number].meta.receivedSum += refund.value;
-            debtor.meta.receivedSum -= refund.value;
         };
 
 
@@ -146,7 +143,7 @@
                 number: null,
                 value: null,
                 currency: null,
-                date: null,
+                date: '' + new Date(),
                 reserve: null
             });
         };
@@ -262,6 +259,20 @@
             return option;
         };
 
+        $scope.getReceivedSum = function (account, participant, participantIndex) {
+            participant.meta.receivedSum = 0;
+
+            account.participants.forEach(function(person, i, arr) {
+                person.fixation.whom.forEach(function(refund, n, arr) {
+                    if (participantIndex == refund.number) {
+                        participant.meta.receivedSum += $scope.getMoneyByAccountCurrency(refund.value, refund.currency);
+                    }
+                });
+            });
+
+            return $scope.roundOff(participant.meta.receivedSum);
+        };
+
 
 
 
@@ -279,66 +290,6 @@
             }
         };
 
-        $scope.acceptRefund = function (participant, refund, refundIndex) {
-            // console.log('participant=', participant);
-            // console.log('refund=', refund);
-            // console.log('refundIndex=', refundIndex);
-
-            var currentAccount, reserve;
-
-            if (refund.number !== null && refund.value !== null && refund.currency !== null) {
-
-                // todo: correct receivedSum counting
-                currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
-                currentAccount.participants[refund.number].meta.receivedSum -= parseFloat(refund.value);
-                participant.meta.receivedSum += parseFloat(refund.value);
-
-                // reserve = currentAccount.participants[refund.number].meta.balance + currentAccount.participants[refund.number].meta.receivedSum;
-                // refund.reserve = (reserve < 0) ? $scope.roundOff(-reserve) : 0;
-
-                refund.date = '' + new Date();
-            }
-        };
-
-        // $scope.fixRefund = function (participant, refund, refundIndex) {
-        //     var reserve, currentAccount;
-        //
-        //     refund.value = $scope.roundOff(refund.value);
-        //
-        //     if (refund.number === null || !(refund.value > 0) || refund.currency === null) {
-        //         refund.checked = false;
-        //         return;
-        //     }
-        //
-        //     currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
-        //
-        //     if (participant.fixation.whom.length == refundIndex + 1) {
-        //         participant.fixation.whom.push({
-        //             number: null,
-        //             value: null,
-        //             currency: null,
-        //             date: null,
-        //             reserve: null,
-        //             checked: false
-        //         });
-        //     }
-        //
-        //     if (refund.checked) {
-        //         currentAccount.participants[refund.number].meta.receivedSum -= refund.value;
-        //         participant.meta.receivedSum += refund.value;
-        //     } else {
-        //         currentAccount.participants[refund.number].meta.receivedSum += refund.value;
-        //         participant.meta.receivedSum -= refund.value;
-        //     }
-        //     refund.value = $scope.roundOff(refund.value);
-        //
-        //     // todo: to do correct data for reserve
-        //     reserve = currentAccount.participants[refund.number].meta.balance + currentAccount.participants[refund.number].meta.receivedSum;
-        //     refund.reserve = (reserve < 0) ? $scope.roundOff(-reserve) : 0;
-        //
-        //     refund.date = '' + new Date();
-        // };
-
         $scope.fillRefundFields = function (account, debtor, refund, refundIndex) {
             var value,
                 sponsor = account.participants[refund.number],
@@ -347,8 +298,6 @@
             value = $scope.roundOff((sponsor.meta.balance - debt < 0) ? sponsor.meta.balance : debt);
             refund.value = (value < 0) ? 0 : value;
             refund.currency = sponsor.meta.preferredCurrency;
-
-            $scope.acceptRefund(debtor, refund, refundIndex);
         };
 
         $scope.formatDate = function (value) {
