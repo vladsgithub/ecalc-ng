@@ -260,7 +260,16 @@
 										<span class="flex-grow1">
 											<span ng-if="participant.meta.balance < 0">Вернет</span>
 											<span ng-if="participant.meta.balance >= 0">Получит</span>
-											(<span class="text-uppercase">{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}</span>):
+											(
+											<span class="text-uppercase" ng-if="participant.meta.balance < 0">
+												{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}
+											</span>
+											<span class="text-uppercase inline-block" ng-if="participant.meta.balance >= 0">
+												<select class="form-control currency-select" ng-model="participant.meta.preferredCurrency"
+														ng-options="key as value for (key, value) in expCalc.settings.currencies.names">
+												</select>
+											</span>
+											):
 										</span>
 										<span class="text-uppercase">
 											<b>
@@ -291,7 +300,7 @@
 
 													<option ng-repeat="sponsor in account.participants track by $index"
 															value="{{$index}}" ng-if="participantIndex != $index">
-														{{getParticipantOption(participant.meta.balance, sponsor.meta)}}
+														{{getParticipantOption(sponsor, participant)}}
 													</option>
 												</select>
 											</div>

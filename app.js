@@ -180,8 +180,15 @@
         $scope.getMoneyByAccountCurrency = function (value, exchangeCurrency) {
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
                 rate = $scope.expCalc.settings.currencies.rates[currentAccount.settings.accountCurrency][exchangeCurrency];
-
+console.log('getMoneyByAccountCurrency -> value * rate -> ', value, '*', rate);
             return value * rate;
+        };
+
+        $scope.getMoneyByPrefferedCurrency = function (value, exchangeCurrency) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                rate = $scope.expCalc.settings.currencies.rates[currentAccount.settings.accountCurrency][exchangeCurrency];
+console.log('getMoneyByPrefferedCurrency -> value * rate -> ', value, '*', rate);
+            return value / rate;
         };
 
         $scope.getExpenseWithRate = function (expense) {
@@ -250,13 +257,17 @@
             return participant.meta.balance;
         };
 
-        $scope.getParticipantOption = function (participantBalance, sponsorMeta) {
-            var option = sponsorMeta.title;
-
-            if (participantBalance < 0 && sponsorMeta.balance > 0) {
-                option += ' - [BYN ' + $scope.roundOff(sponsorMeta.balance) + ']';
+        $scope.getParticipantOption = function (sponsor, debtor) {
+            var currencyNumber, option = sponsor.meta.title;
+console.log('************************');
+console.log('sponsor=', sponsor.meta.title, 'debtor=', debtor.meta.title);
+            if (debtor.meta.balance < 0 && sponsor.meta.balance > 0) {
+                // option += ' - [BYN ' + $scope.roundOff(sponsorMeta.balance) + ']';
+                currencyNumber = $scope.getRest(sponsor, debtor).currency;
+                option += ' - [' + $scope.expCalc.settings.currencies.names[currencyNumber].toUpperCase() + ' ' +
+                    $scope.getRest(sponsor, debtor).rest + ']';
             }
-
+console.log(option);
             return option;
         };
 
@@ -286,6 +297,25 @@
             return $scope.roundOff(participant.meta.givenSum);
         };
 
+        $scope.getRest = function (sponsor, debtor) {
+            var rest, debt, fullSponsorBalance;
+
+            debt = $scope.getMoneyByPrefferedCurrency(-debtor.meta.balance, sponsor.meta.preferredCurrency) - debtor.meta.givenSum;
+            fullSponsorBalance = sponsor.meta.balance - sponsor.meta.receivedSum;
+            rest = $scope.roundOff((fullSponsorBalance - debt < 0) ? fullSponsorBalance : debt);
+            rest = (rest < 0) ? 0 : rest;
+console.log('getRest -> ', debt, fullSponsorBalance, (rest < 0) ? 0 : rest);
+
+            // sponsorWillReceive = sponsor.meta.balance - sponsor.meta.receivedSum;
+            // debtorWillGive = debtor.meta.balance - debtor.meta.givenSum;
+
+
+            return {
+                rest: (rest < 0) ? 0 : rest,
+                currency: sponsor.meta.preferredCurrency
+            }
+        };
+
 
 
 
@@ -298,14 +328,10 @@
         };
 
         $scope.fillRefundFields = function (account, debtor, refund) {
-            var value, fullBalance,
-                sponsor = account.participants[refund.number],
-                debt = $scope.getMoneyByAccountCurrency(-debtor.meta.balance, sponsor.meta.preferredCurrency) - debtor.meta.givenSum;
+            var sponsor = account.participants[refund.number];
 
-            fullBalance = sponsor.meta.balance - sponsor.meta.receivedSum;
-            value = $scope.roundOff((fullBalance - debt < 0) ? fullBalance : debt);
-            refund.value = (value < 0) ? 0 : value;
-            refund.currency = sponsor.meta.preferredCurrency;
+            refund.value = $scope.getRest(sponsor, debtor).rest;
+            refund.currency = $scope.getRest(sponsor, debtor).currency;
         };
 
         $scope.formatDate = function (value) {
