@@ -76,11 +76,6 @@
 
 							<ul class="expenses">
 								<li class="padding5-0 bg" ng-repeat="expense in participant.expenses track by $index">
-
-									<div class="test-block">
-										expenseWithRate = {{getExpenseWithRate(expense)}}
-									</div>
-
 									<div class="flex">
 										<div>
 											<button class="btn btn-danger" ng-click="removeExpense(this)">
@@ -210,14 +205,6 @@
 											<label>
 												<input type="checkbox" ng-model="expense.partList[extParticipantIndex]">
 												{{expense.title}}
-
-												<div>
-													<!-- partList[] * participation * expense / partSumOfExpense -->
-													{{expense.partList[extParticipantIndex]}} *
-													{{extParticipant.meta.participation}} *
-													{{getExpenseWithRate(expense)}} /
-													{{getPartSumOfExpense(account, expense)}} =
-												</div>
 											</label>
 
 											<span class="float-right text-uppercase">

@@ -180,14 +180,14 @@
         $scope.getMoneyByAccountCurrency = function (value, exchangeCurrency) {
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
                 rate = $scope.expCalc.settings.currencies.rates[currentAccount.settings.accountCurrency][exchangeCurrency];
-console.log('getMoneyByAccountCurrency -> value * rate -> ', value, '*', rate);
+
             return value * rate;
         };
 
         $scope.getMoneyByPrefferedCurrency = function (value, exchangeCurrency) {
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
                 rate = $scope.expCalc.settings.currencies.rates[currentAccount.settings.accountCurrency][exchangeCurrency];
-console.log('getMoneyByPrefferedCurrency -> value * rate -> ', value, '*', rate);
+
             return value / rate;
         };
 
@@ -259,15 +259,18 @@ console.log('getMoneyByPrefferedCurrency -> value * rate -> ', value, '*', rate)
 
         $scope.getParticipantOption = function (sponsor, debtor) {
             var currencyNumber, option = sponsor.meta.title;
-console.log('************************');
-console.log('sponsor=', sponsor.meta.title, 'debtor=', debtor.meta.title);
-            if (debtor.meta.balance < 0 && sponsor.meta.balance > 0) {
-                // option += ' - [BYN ' + $scope.roundOff(sponsorMeta.balance) + ']';
+
+            if (debtor.meta.balance < 0 &&
+                $scope.roundOff(sponsor.meta.balance - sponsor.meta.receivedSum) > 0 &&
+                $scope.roundOff(debtor.meta.balance + debtor.meta.givenSum) < 0) {
+
                 currencyNumber = $scope.getRest(sponsor, debtor).currency;
                 option += ' - [' + $scope.expCalc.settings.currencies.names[currencyNumber].toUpperCase() + ' ' +
                     $scope.getRest(sponsor, debtor).rest + ']';
             }
-console.log(option);
+console.log('************************');
+console.log('sponsor=', sponsor.meta.title, 'debtor=', debtor.meta.title, 'option=', option);
+
             return option;
         };
 
@@ -282,7 +285,9 @@ console.log(option);
                 });
             });
 
-            return $scope.roundOff(participant.meta.receivedSum);
+            participant.meta.receivedSum = $scope.roundOff(participant.meta.receivedSum);
+
+            return participant.meta.receivedSum;
         };
 
         $scope.getGivenSum = function (participant) {
@@ -294,24 +299,22 @@ console.log(option);
                 }
             });
 
-            return $scope.roundOff(participant.meta.givenSum);
+            participant.meta.givenSum = $scope.roundOff(participant.meta.givenSum);
+
+            return participant.meta.givenSum;
         };
 
         $scope.getRest = function (sponsor, debtor) {
-            var rest, debt, fullSponsorBalance;
+            var sponsorWillReceive, debtorWillGive, rest;
 
-            debt = $scope.getMoneyByPrefferedCurrency(-debtor.meta.balance, sponsor.meta.preferredCurrency) - debtor.meta.givenSum;
-            fullSponsorBalance = sponsor.meta.balance - sponsor.meta.receivedSum;
-            rest = $scope.roundOff((fullSponsorBalance - debt < 0) ? fullSponsorBalance : debt);
-            rest = (rest < 0) ? 0 : rest;
-console.log('getRest -> ', debt, fullSponsorBalance, (rest < 0) ? 0 : rest);
+            sponsorWillReceive = sponsor.meta.balance - sponsor.meta.receivedSum;
+            debtorWillGive = Math.abs(debtor.meta.balance + debtor.meta.givenSum);
 
-            // sponsorWillReceive = sponsor.meta.balance - sponsor.meta.receivedSum;
-            // debtorWillGive = debtor.meta.balance - debtor.meta.givenSum;
-
+            rest = (sponsorWillReceive - debtorWillGive > 0) ? debtorWillGive : sponsorWillReceive;
+            rest = $scope.getMoneyByPrefferedCurrency(rest, sponsor.meta.preferredCurrency);
 
             return {
-                rest: (rest < 0) ? 0 : rest,
+                rest: (rest < 0) ? 0 : $scope.roundOff(rest),
                 currency: sponsor.meta.preferredCurrency
             }
         };
