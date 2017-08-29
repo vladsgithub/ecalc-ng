@@ -305,14 +305,15 @@
         $scope.getRest = function (sponsor, debtor) {
             var sponsorWillReceive, debtorWillGive, preferredCurrencyRest, accountCurrencyRest;
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
-                accountCurrency = currentAccount.settings.accountCurrency;
+                accountCurrency = currentAccount.settings.accountCurrency,
+                isRoundDown = (sponsor.meta.preferredCurrency == accountCurrency) ? false : true;
 
             sponsorWillReceive = sponsor.meta.balance - sponsor.meta.receivedSum;
             debtorWillGive = Math.abs(debtor.meta.balance + debtor.meta.givenSum);
 
             accountCurrencyRest = (sponsorWillReceive - debtorWillGive > 0) ? debtorWillGive : sponsorWillReceive;
             preferredCurrencyRest = $scope.getMoneyByPrefferedCurrency(accountCurrencyRest, sponsor.meta.preferredCurrency);
-            preferredCurrencyRest = (preferredCurrencyRest < 0) ? 0 : $scope.roundOff(preferredCurrencyRest, true);
+            preferredCurrencyRest = (preferredCurrencyRest < 0) ? 0 : $scope.roundOff(preferredCurrencyRest, isRoundDown);
 
             return {
                 rest: (preferredCurrencyRest == 0) ? $scope.roundOff(accountCurrencyRest) : preferredCurrencyRest,
@@ -320,8 +321,14 @@
             }
         };
 
-        $scope.getParticipantBalance = function () {
+        $scope.getParticipantFullBalance = function (participant, participantIndex) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                participantBalance = $scope.roundOff(participant.meta.balance),
+                participantReceivedSum = $scope.getReceivedSum(currentAccount, participant, participantIndex),
+                participantGivenSum = $scope.getGivenSum(participant),
+                result = participantBalance - participantReceivedSum + participantGivenSum;
 
+            return $scope.roundOff(result);
         };
 
 

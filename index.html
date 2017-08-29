@@ -259,11 +259,8 @@
 											):
 										</span>
 										<span class="text-uppercase">
-											<b>
-												{{roundOff(participant.meta.balance)}}
-												({{getReceivedSum(account, participant, participantIndex)}})
-												[{{getGivenSum(participant)}}]
-											</b>
+											<span>({{roundOff(participant.meta.balance)}})</span>
+											<b>{{getParticipantFullBalance(participant, participantIndex)}}</b>
 										</span>
 									</h5>
 								</div>
