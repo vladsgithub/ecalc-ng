@@ -268,8 +268,6 @@
                 option += ' - [' + $scope.expCalc.settings.currencies.names[currencyNumber].toUpperCase() + ' ' +
                     $scope.getRest(sponsor, debtor).rest + ']';
             }
-console.log('************************');
-console.log('sponsor=', sponsor.meta.title, 'debtor=', debtor.meta.title, 'option=', option);
 
             return option;
         };
@@ -305,18 +303,25 @@ console.log('sponsor=', sponsor.meta.title, 'debtor=', debtor.meta.title, 'optio
         };
 
         $scope.getRest = function (sponsor, debtor) {
-            var sponsorWillReceive, debtorWillGive, rest;
+            var sponsorWillReceive, debtorWillGive, preferredCurrencyRest, accountCurrencyRest;
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                accountCurrency = currentAccount.settings.accountCurrency;
 
             sponsorWillReceive = sponsor.meta.balance - sponsor.meta.receivedSum;
             debtorWillGive = Math.abs(debtor.meta.balance + debtor.meta.givenSum);
 
-            rest = (sponsorWillReceive - debtorWillGive > 0) ? debtorWillGive : sponsorWillReceive;
-            rest = $scope.getMoneyByPrefferedCurrency(rest, sponsor.meta.preferredCurrency);
+            accountCurrencyRest = (sponsorWillReceive - debtorWillGive > 0) ? debtorWillGive : sponsorWillReceive;
+            preferredCurrencyRest = $scope.getMoneyByPrefferedCurrency(accountCurrencyRest, sponsor.meta.preferredCurrency);
+            preferredCurrencyRest = (preferredCurrencyRest < 0) ? 0 : $scope.roundOff(preferredCurrencyRest, true);
 
             return {
-                rest: (rest < 0) ? 0 : $scope.roundOff(rest),
-                currency: sponsor.meta.preferredCurrency
+                rest: (preferredCurrencyRest == 0) ? $scope.roundOff(accountCurrencyRest) : preferredCurrencyRest,
+                currency: (preferredCurrencyRest == 0) ? accountCurrency : sponsor.meta.preferredCurrency
             }
+        };
+
+        $scope.getParticipantBalance = function () {
+
         };
 
 
@@ -325,9 +330,14 @@ console.log('sponsor=', sponsor.meta.title, 'debtor=', debtor.meta.title, 'optio
 
 
         // OTHER METHODS ===============================
-        $scope.roundOff = function (value) {
+        $scope.roundOff = function (value, isDown) {
             if (value === undefined) return 0;
-            return Math.round(value * 100) / 100;
+
+            if (isDown) {
+                return Math.floor(value * 100) / 100;
+            } else {
+                return Math.round(value * 100) / 100;
+            }
         };
 
         $scope.fillRefundFields = function (account, debtor, refund) {
