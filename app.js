@@ -326,9 +326,28 @@
                 participantBalance = $scope.roundOff(participant.meta.balance),
                 participantReceivedSum = $scope.getReceivedSum(currentAccount, participant, participantIndex),
                 participantGivenSum = $scope.getGivenSum(participant),
-                result = participantBalance - participantReceivedSum + participantGivenSum;
+                result = $scope.roundOff(participantBalance - participantReceivedSum + participantGivenSum);
 
-            return $scope.roundOff(result);
+            participant.meta.fullBalance = result;
+
+            return result;
+        };
+
+        $scope.getReturnsBalance = function () {
+            var positive = 0,
+                negative = 0,
+                currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+
+            currentAccount.participants.forEach(function(participant, i, arr) {
+                if (participant.meta.fullBalance > 0) {
+                    positive += participant.meta.fullBalance;
+                }
+                if (participant.meta.fullBalance < 0) {
+                    negative += participant.meta.fullBalance;
+                }
+            });
+
+            return $scope.roundOff(negative) + ' / ' + $scope.roundOff(positive);
         };
 
 
