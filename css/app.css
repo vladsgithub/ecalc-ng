@@ -92,6 +92,30 @@ body {
 header {
 	padding: 10px;
 }
+.currencies-box {
+	display: none;
+	position: absolute;
+	right: 5px;
+	margin-top: 10px;
+	padding: 20px;
+	background: white;
+	border: 1px solid;
+}
+input:checked + .currencies-box {
+	display: block;
+}
+.currencies-box th input {
+	background: #a5ffac;
+	font-weight: bold;
+}
+.currencies-box td {
+	text-transform: uppercase;
+}
+.currencies-box input {
+	min-width: 100px;
+	text-transform: uppercase;
+	text-align: center;
+}
 .warning {
 	background-color: #ffe2e2;
 	color: #970000;

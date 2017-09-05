@@ -21,8 +21,7 @@
                     total: 0,
                     fullRefund: 0
                 },
-                participants: [],
-                sponsors: []
+                participants: []
             };
 
             accounts.push(newAccount);
@@ -416,7 +415,7 @@
         if (false) {
             $scope.expCalc = getDataService;
         } else {
-            $scope.expCalc = {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,0.8971,59.8981,1.927],[null,1,null,null],[null,null,1,null],[1.933,2.158,0.0324,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет","total":6,"fullRefund":-1.9000000000000001},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"3","total":2,"share":0.8,"balance":1.2,"receivedSum":0,"givenSum":0},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Wed Aug 16 2017 12:21:20 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[false,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":1,"share":2.6,"balance":-1.6,"receivedSum":0,"givenSum":0},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Wed Aug 16 2017 12:21:27 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"3","total":2,"share":1.3,"balance":0.7,"receivedSum":0,"givenSum":0},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Wed Aug 16 2017 12:21:29 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":1,"share":1.3,"balance":-0.30000000000000004,"receivedSum":0,"givenSum":0},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Wed Aug 16 2017 12:21:30 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}}],"sponsors":[]}]}
+            $scope.expCalc = {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,1.1934,0.0174,0.5186],[0.8379,1,0.0146,0.4345],[57.322,68.4158,1,29.7271],[1.928,2.2963,0.0336,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет","total":6,"fullRefund":-1.9000000000000001},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"1","total":2,"share":0.8,"balance":1.2,"receivedSum":0,"givenSum":0,"fullBalance":1.2},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Tue Sep 05 2017 17:52:37 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[false,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":1,"share":2.6,"balance":-1.6,"receivedSum":0,"givenSum":0,"fullBalance":-1.6},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Tue Sep 05 2017 17:52:42 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"0","total":2,"share":1.3,"balance":0.7,"receivedSum":0,"givenSum":0,"fullBalance":0.7},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Tue Sep 05 2017 17:52:44 GMT+0300 (Belarus Standard Time)","value":2,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":1,"share":1.3,"balance":-0.30000000000000004,"receivedSum":0,"givenSum":0,"fullBalance":-0.3},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Tue Sep 05 2017 17:52:48 GMT+0300 (Belarus Standard Time)","value":1,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}}]}]}
         }
         if (!$scope.expCalc.accounts.length) $scope.createAccount();
     }];
@@ -437,10 +436,10 @@
             currencies = {
                 names: ['usd', 'eur', 'rub', 'byn'], // The currency number of 0, 1, 2 and 3
                 rates: [ // Banks sell by these rates
-                    [1, 0.8971, 59.8981, 1.9270], // rates of the currency number 0
-                    [null, 1, null, null], // rates of the currency number 1
-                    [null, null, 1, null], // rates of the currency number 2
-                    [1.9330, 2.1580, 0.0324, 1] // rates of the currency number 3
+                    [1,1.1934,0.0174,0.5186], // rates of the currency number 0
+                    [0.8379,1,0.0146,0.4345], // rates of the currency number 1
+                    [57.322,68.4158,1,29.7271], // rates of the currency number 2
+                    [1.928,2.2963,0.0336,1] // rates of the currency number 3
                 ]
             };
             expensesTypes = [

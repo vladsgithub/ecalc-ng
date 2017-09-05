@@ -24,6 +24,34 @@
 	<button class="btn btn-primary" ng-click="createAccount()">
 		<i class="fa fa-plus"></i>
 	</button>
+
+	<div class="float-right" style="position: relative;">
+		<label class="btn btn-info" for="currenciesBox">Currencies</label>
+		<input id="currenciesBox" type="checkbox" style="visibility: hidden;" />
+		<div class="currencies-box">
+
+			<table ng-init="currencies = expCalc.settings.currencies">
+				<thead>
+				<tr>
+					<th> </th>
+					<th ng-repeat="name in currencies.names track by $index">
+						<input type="text" class="form-control" ng-model="currencies.names[$index]" />
+					</th>
+				</tr>
+				</thead>
+
+				<tbody>
+				<tr ng-repeat="name in expCalc.settings.currencies.names track by $index" ng-init="nameIndex = $index">
+					<td>{{name}}</td>
+					<td ng-repeat="array in currencies.rates[nameIndex] track by $index">
+						<input type="number" class="form-control" ng-model="currencies.rates[nameIndex][$index]" />
+					</td>
+				</tr>
+				</tbody>
+			</table>
+
+		</div>
+	</div>
 </header>
 
 <main>
