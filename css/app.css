@@ -196,7 +196,7 @@ input:checked + .currencies-box {
 	background: #ffe1df;
 }
 .step3 .bg {
-	background: #f3ad9c;
+	background: #ffc0aa;
 }
 .step3 .participants > li {
 	border-top: 5px solid #bd0600;
@@ -235,4 +235,7 @@ input:checked + .currencies-box {
 .share {
 	width: 50%;
 	text-align: right;
+}
+.debtor .bg {
+	background: #ff9191;
 }

@@ -125,14 +125,14 @@
 
 									<div class="flex padding5-0">
 										<div class="date">{{formatDate(expense.date)}}</div>
-										<div class="flex-grow1">
-											<input class="form-control" type="number" placeholder="сумма"
-												   ng-model="expense.value">
-										</div>
 										<div class="currency">
 											<select class="form-control currency-select" ng-model="expense.currency"
 													ng-options="key as value for (key, value) in expCalc.settings.currencies.names">
 											</select>
+										</div>
+										<div class="flex-grow1">
+											<input class="form-control" type="number" placeholder="сумма"
+												   ng-model="expense.value">
 										</div>
 									</div>
 								</li>
@@ -266,6 +266,7 @@
 
 						<ul class="participants">
 							<li class="padding5-0" ng-repeat="participant in account.participants track by $index"
+								ng-class="participant.meta.fullBalance < 0 ? 'debtor' : 'sponsor'"
 								ng-init="participantIndex = $index">
 
 								<div class="padding5-0 bg">
@@ -316,10 +317,6 @@
 													</option>
 												</select>
 											</div>
-											<div class="flex-grow1">
-												<input type="text" class="form-control" placeholder="сумма"
-													   ng-model="refund.value">
-											</div>
 											<div>
 												<select class="form-control currency-select"
 														ng-model="refund.currency">
@@ -329,6 +326,10 @@
 														{{currency}}
 													</option>
 												</select>
+											</div>
+											<div class="flex-grow1">
+												<input type="text" class="form-control" placeholder="сумма"
+													   ng-model="refund.value">
 											</div>
 										</div>
 
