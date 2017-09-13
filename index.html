@@ -78,7 +78,7 @@
 						<span class="text-uppercase">
 							<b>
 								{{roundOff(getAccountTotal(account))}}
-								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+								{{getAccountCurrency()}}
 							</b>
 						</span>
 					</h5>
@@ -97,7 +97,7 @@
 								<div>
 									<h5 class="nowrap text-uppercase">
 										{{roundOff(getParticipantTotal(account, participant))}}
-										{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+										{{getAccountCurrency()}}
 									</h5>
 								</div>
 							</div>
@@ -164,7 +164,7 @@
 						<span class="text-uppercase">
 							<b>
 								{{roundOff(getFullRefund(account))}}
-								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+								{{getAccountCurrency()}}
 							</b>
 						</span>
 					</h5>
@@ -173,7 +173,7 @@
 						<span class="float-right text-uppercase">
 							<b>
 								{{getAccountTotal(account)}}
-								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+								{{getAccountCurrency()}}
 							</b>
 						</span>
 					</h5>
@@ -182,7 +182,7 @@
 						<span class="float-right text-uppercase">
 							<b>
 								{{getShareTotal(account)}}
-								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+								{{getAccountCurrency()}}
 							</b>
 						</span>
 					</h5>
@@ -211,14 +211,14 @@
 									<h5>Баланс</h5>
 									<h5 class="text-uppercase">
 										{{roundOff(getBalance(extParticipant))}}
-										{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+										{{getAccountCurrency()}}
 									</h5>
 								</div>
 								<div class="share">
 									<h5>Доля</h5>
 									<h5 class="text-uppercase">
 										{{roundOff(getParticipantShare(account, extParticipantIndex))}}
-										{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+										{{getAccountCurrency()}}
 									</h5>
 								</div>
 							</div>
@@ -256,7 +256,7 @@
 						<span class="text-uppercase">
 							<b>
 								{{getReturnsBalance()}}
-								{{expCalc.settings.currencies.names[account.settings.accountCurrency]}}
+								{{getAccountCurrency()}}
 							</b>
 						</span>
 					</h5>
@@ -272,24 +272,25 @@
 								<div class="padding5-0 bg">
 									<h5 class="nowrap">{{participant.meta.title}}</h5>
 
+									<h5 class="margin5-0">
+										<span ng-if="participant.meta.balance < 0">Вернет:</span>
+										<span ng-if="participant.meta.balance >= 0">Получит</span>
+										<span class="text-uppercase inline-block" ng-if="participant.meta.balance >= 0">
+											<select class="form-control currency-select" ng-model="participant.meta.preferredCurrency"
+													ng-options="key as value for (key, value) in expCalc.settings.currencies.names">
+											</select>
+										</span>
+									</h5>
+
 									<h5 class="margin5-0 flex">
-										<span class="flex-grow1">
-											<span ng-if="participant.meta.balance < 0">Вернет</span>
-											<span ng-if="participant.meta.balance >= 0">Получит</span>
-											(
-											<span class="text-uppercase" ng-if="participant.meta.balance < 0">
+										<span class="flex-grow1 text-uppercase">
+											<b>
+												{{getParticipantFullBalance(participant, participantIndex, true)}}
 												{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}
-											</span>
-											<span class="text-uppercase inline-block" ng-if="participant.meta.balance >= 0">
-												<select class="form-control currency-select" ng-model="participant.meta.preferredCurrency"
-														ng-options="key as value for (key, value) in expCalc.settings.currencies.names">
-												</select>
-											</span>
-											):
+											</b>
 										</span>
 										<span class="text-uppercase">
-											<span>({{roundOff(participant.meta.balance)}})</span>
-											<b>{{getParticipantFullBalance(participant, participantIndex)}}</b>
+											<b>{{getParticipantFullBalance(participant, participantIndex, false)}} {{getAccountCurrency()}}</b>
 										</span>
 									</h5>
 								</div>

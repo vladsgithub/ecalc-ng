@@ -148,6 +148,7 @@ input:checked + .currencies-box {
 }
 .flex > .flex-grow1 {
 	flex-grow: 1;
+	white-space: nowrap;
 }
 .margin5-0 {
 	margin: 5px 0;

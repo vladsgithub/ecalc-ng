@@ -154,6 +154,12 @@
 
 
         // METHODS OF GETTING ===============================
+        $scope.getAccountCurrency = function() {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+
+            return $scope.expCalc.settings.currencies.names[currentAccount.settings.accountCurrency];
+        };
+
         $scope.getAccountTotal = function (account) {
             account.meta.total = 0;
 
@@ -323,17 +329,20 @@
             }
         };
 
-        $scope.getParticipantFullBalance = function (participant, participantIndex) {
+        $scope.getParticipantFullBalance = function (participant, participantIndex, byPrefferedCurrency) {
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
                 participantBalance = $scope.roundOff(participant.meta.balance),
                 participantReceivedSum = $scope.getReceivedSum(currentAccount, participant, participantIndex),
                 participantGivenSum = $scope.getGivenSum(participant),
-                result = $scope.roundOff(participantBalance - participantReceivedSum + participantGivenSum);
+                calculation = participantBalance - participantReceivedSum + participantGivenSum,
+                result = $scope.roundOff(calculation),
+                resultByPrefferedCurrency = $scope.getMoneyByPrefferedCurrency(calculation, participant.meta.preferredCurrency);
+
 // console.log('-----------', participant.meta.title);
 // console.log('participantBalance, participantReceivedSum, participantGivenSum ===> ', participantBalance, participantReceivedSum, participantGivenSum);
             participant.meta.fullBalance = result;
 
-            return result;
+            return (byPrefferedCurrency) ? $scope.roundOff(resultByPrefferedCurrency, true) : result;
         };
 
         $scope.getReturnsBalance = function () {
