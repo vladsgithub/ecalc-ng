@@ -266,36 +266,35 @@
 
 						<ul class="participants">
 							<li class="padding5-0" ng-repeat="participant in account.participants track by $index"
-								ng-class="participant.meta.fullBalance < 0 ? 'debtor' : 'sponsor'"
+								ng-class="{'debtor': participant.meta.fullBalance < 0, 'sponsor': participant.meta.fullBalance > 0}"
 								ng-init="participantIndex = $index">
 
 								<div class="padding5-0 bg">
 									<h5 class="nowrap">{{participant.meta.title}}</h5>
 
 									<h5 class="margin5-0">
-										<span ng-if="participant.meta.balance < 0">Вернет:</span>
-										<span ng-if="participant.meta.balance >= 0">Получит</span>
-										<span class="text-uppercase inline-block" ng-if="participant.meta.balance >= 0">
+										<span>{{participant.meta.fullBalance >= 0 ? 'Получит' : 'Вернет:'}}</span>
+										<span class="text-uppercase inline-block" ng-if="participant.meta.fullBalance >= 0">
 											<select class="form-control currency-select" ng-model="participant.meta.preferredCurrency"
 													ng-options="key as value for (key, value) in expCalc.settings.currencies.names">
 											</select>
 										</span>
-									</h5>
-
-									<h5 class="margin5-0 flex">
-										<span class="flex-grow1 text-uppercase">
+										<span class="text-uppercase"
+											  ng-if="participant.meta.fullBalance >= 0 && participant.meta.preferredCurrency != account.settings.accountCurrency">
 											<b>
 												{{getParticipantFullBalance(participant, participantIndex, true)}}
-												{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}
+												<!--{{expCalc.settings.currencies.names[participant.meta.preferredCurrency]}}-->
 											</b>
 										</span>
-										<span class="text-uppercase">
+										<span class="text-uppercase float-right">
 											<b>{{getParticipantFullBalance(participant, participantIndex, false)}} {{getAccountCurrency()}}</b>
 										</span>
 									</h5>
 								</div>
 
 								<ul class="part-list">
+									<li class="padding5-0" ng-if="participant.fixation.whom.length > 0">Вернул:</li>
+
 									<li class="bg padding5-0 it-was-returned"
 										ng-repeat="refund in participant.fixation.whom track by $index"
 										ng-init="refundIndex = $index">

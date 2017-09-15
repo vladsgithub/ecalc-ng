@@ -371,6 +371,8 @@
         $scope.roundOff = function (value, isDown) {
             if (value === undefined) return 0;
 
+            value = Math.round(value * 100000000) / 100000000; // in order to cut off a very long fractional part
+
             if (isDown) {
                 return Math.floor(value * 100) / 100;
             } else {
