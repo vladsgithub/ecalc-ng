@@ -308,7 +308,8 @@
 											<div>
 												<select class="form-control paddingD-0" style="min-width: 110px;"
 														ng-model="refund.number"
-														ng-change="fillRefundFields(account, participant, refund)">
+														ng-change="fillRefundFields(account, participant, refund)"
+														ng-disabled="refund.isFixed">
 													<option value="" hidden disabled selected>Выберите участника</option>
 
 													<option ng-repeat="sponsor in account.participants track by $index"
@@ -319,7 +320,8 @@
 											</div>
 											<div>
 												<select class="form-control currency-select"
-														ng-model="refund.currency">
+														ng-model="refund.currency"
+														ng-disabled="refund.isFixed">
 													<option value="" hidden disabled selected>- - -</option>
 													<option ng-repeat="currency in expCalc.settings.currencies.names track by $index"
 															value="{{$index}}">
@@ -329,7 +331,12 @@
 											</div>
 											<div class="flex-grow1">
 												<input type="text" class="form-control" placeholder="сумма"
-													   ng-model="refund.value">
+													   ng-model="refund.value"
+													   ng-disabled="refund.isFixed">
+											</div>
+											<div>
+												<input class="big-checkbox" type="checkbox" ng-model="refund.isFixed"
+													   ng-change="checkRefundFields(refund)" />
 											</div>
 										</div>
 
@@ -340,7 +347,8 @@
 									</li>
 
 									<li class="bg padding5-0">
-										<button class="btn btn-primary" ng-click="addNewPayment(participant)">
+										<button class="btn btn-primary" ng-click="addNewPayment(participant)"
+												ng-if="isAllRefundsFixed(participant)">
 											<i class="fa fa-plus"></i>
 										</button>
 										Сделать новый взнос

@@ -46,6 +46,7 @@
                 expenses: [],
                 fixation: {
                     whom: [],
+                    whomRezerv: [],
                     byBank: [] // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
                 }
             };
@@ -141,9 +142,10 @@
         $scope.addNewPayment = function(participant) {
             participant.fixation.whom.push({
                 number: null,
-                value: 0,
+                value: null,
                 currency: null,
                 date: '' + new Date(),
+                isFixed: false,
                 reserve: 0
             });
         };
@@ -185,7 +187,7 @@
         $scope.getMoneyByAccountCurrency = function (value, exchangeCurrency) {
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
                 rate = $scope.expCalc.settings.currencies.rates[currentAccount.settings.accountCurrency][exchangeCurrency];
-
+// console.log('getMoneyByAccountCurrency -> value * rate =', value * rate);
             return value * rate;
         };
 
@@ -282,7 +284,7 @@
 // console.log('-----------', participant.meta.title);
             account.participants.forEach(function(person, i, arr) {
                 person.fixation.whom.forEach(function(refund, n, arr) {
-                    if (participantIndex == refund.number && refund.number !== null && refund.currency !== null) {
+                    if (refund.isFixed && participantIndex == refund.number && refund.number !== null && refund.currency !== null) {
 // console.log(participant.meta.receivedSum , ' += ', $scope.getMoneyByAccountCurrency(refund.value, refund.currency));
                         participant.meta.receivedSum += $scope.roundOff($scope.getMoneyByAccountCurrency(refund.value, refund.currency), true);
 // console.log('++++++++++++++++receivedSum = ', participant.meta.receivedSum);
@@ -299,7 +301,8 @@
             participant.meta.givenSum = 0;
 // console.log('-----------', participant.meta.title);
             participant.fixation.whom.forEach(function(refund, i, arr) {
-                if (refund.number !== null && refund.currency !== null) {
+                if (refund.isFixed && refund.number !== null && refund.currency !== null) {
+// console.log('*** refund.value, refund.currency = ', refund.value, refund.currency);
                     participant.meta.givenSum += $scope.roundOff($scope.getMoneyByAccountCurrency(refund.value, refund.currency), true);
 // console.log('*** participant.meta.givenSum = ', participant.meta.givenSum);
                 }
@@ -370,20 +373,26 @@
         // OTHER METHODS ===============================
         $scope.roundOff = function (value, isDown) {
             if (value === undefined) return 0;
+            if (value > 9999999999) {
+                console.error('The value is very long:', value);
+                return 0;
+            }
 
-            value = Math.round(value * 100000000) / 100000000; // in order to cut off a very long fractional part
-
+// console.log('value = ', value);
+            value = Math.round(value * 1000000000 * 100) / 1000000000; // in order to cut off a very long fractional part
+// console.log('value after cut off = ', value);
             if (isDown) {
-                return Math.floor(value * 100) / 100;
+                return Math.floor(value) / 100;
             } else {
-                return Math.round(value * 100) / 100;
+                return Math.round(value) / 100;
             }
         };
 
         $scope.fillRefundFields = function (account, debtor, refund) {
-            var sponsor = account.participants[refund.number];
+            var sponsor = account.participants[refund.number],
+                value = $scope.getRest(sponsor, debtor).rest;
 
-            refund.value = $scope.getRest(sponsor, debtor).rest;
+            refund.value = (debtor.meta.fullBalance < 0 && value > 0) ? value : null;
             refund.currency = $scope.getRest(sponsor, debtor).currency;
         };
 
@@ -395,6 +404,20 @@
             } else {
                 return '';
             }
+        };
+
+        $scope.isAllRefundsFixed = function (participant) {
+            var result = true;
+
+            participant.fixation.whom.forEach(function(refund, i, arr) {
+                result = result && refund.isFixed;
+            });
+
+            return result;
+        };
+
+        $scope.checkRefundFields = function (refund) {
+            if (refund.number == null || refund.value == null || refund.currency == null) refund.isFixed = false;
         };
 
 

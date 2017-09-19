@@ -123,6 +123,10 @@ input:checked + .currencies-box {
 .btn {
 	cursor: pointer;
 }
+.big-checkbox {
+	height: 32px;
+	width: 20px;
+}
 .inline-block {
 	display: inline-block;
 	width: auto;
