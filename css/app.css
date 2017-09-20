@@ -120,12 +120,17 @@ input:checked + .currencies-box {
 	background-color: #ffe2e2;
 	color: #970000;
 }
+hr {
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
 .btn {
 	cursor: pointer;
 }
 .big-checkbox {
-	height: 32px;
+	height: 20px;
 	width: 20px;
+	vertical-align: top;
 }
 .inline-block {
 	display: inline-block;
@@ -201,7 +206,7 @@ input:checked + .currencies-box {
 	background: #ffe1df;
 }
 .step3 .bg {
-	background: #c8e398;
+	background: #7ee56f;
 }
 .step3 .participants > li {
 	border-top: 5px solid #bd0600;
@@ -230,6 +235,9 @@ input:checked + .currencies-box {
 .part-list {
 	padding-left: 14px;
 }
+.part-list .part-list {
+	padding-left: 0;
+}
 
 .participation {
 	width: 70px;
@@ -242,8 +250,11 @@ input:checked + .currencies-box {
 	text-align: right;
 }
 .debtor .bg {
-	 background: #ff9191;
+	 background: #ffa3a3;
  }
 .sponsor .bg {
-	background: #f4ee89;
+	background: #e5e984;
+}
+.completed .bg {
+	background: #7ee56f;
 }

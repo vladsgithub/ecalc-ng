@@ -46,7 +46,6 @@
                 expenses: [],
                 fixation: {
                     whom: [],
-                    whomRezerv: [],
                     byBank: [] // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
                 }
             };
@@ -112,6 +111,7 @@
                 date: '' + new Date(),
                 value: null,
                 currency: obj.$parent.$parent.account.settings.accountCurrency,
+                isPaid: false,
                 partList: []
             };
 
@@ -145,8 +145,7 @@
                 value: null,
                 currency: null,
                 date: '' + new Date(),
-                isFixed: false,
-                reserve: 0
+                isFixed: false
             });
         };
 
@@ -178,7 +177,7 @@
             participant.meta.total = 0;
 
             participant.expenses.forEach(function (expense, i, arr) {
-                participant.meta.total += expense.value * rates[expense.currency];
+                if (expense.isPaid) participant.meta.total += expense.value * rates[expense.currency];
             });
 
             return participant.meta.total;
@@ -215,7 +214,7 @@
         };
 
         $scope.getExpenseShare = function (account, expense, extParticipantIndex) {
-            return expense.partList[extParticipantIndex] *
+            if (expense.isPaid) return expense.partList[extParticipantIndex] *
                 account.participants[extParticipantIndex].meta.participation *
                 $scope.getExpenseWithRate(expense) /
                 $scope.getPartSumOfExpense(account, expense);
@@ -226,7 +225,7 @@
 
             account.participants.forEach(function (participant, i, arr) {
                 participant.expenses.forEach(function (expense, i, arr) {
-                    participantShare += $scope.getExpenseShare(account, expense, extParticipantIndex);
+                    if (expense.isPaid) participantShare += $scope.getExpenseShare(account, expense, extParticipantIndex);
                 });
             });
 
@@ -362,7 +361,10 @@
                 }
             });
 
-            return $scope.roundOff(negative) + ' / ' + $scope.roundOff(positive);
+            currentAccount.meta.negativeFullBalance = $scope.roundOff(negative);
+            currentAccount.meta.positiveFullBalance = $scope.roundOff(positive);
+
+            return currentAccount.meta.negativeFullBalance + ' / ' + currentAccount.meta.positiveFullBalance;
         };
 
 
@@ -420,6 +422,19 @@
             if (refund.number == null || refund.value == null || refund.currency == null) refund.isFixed = false;
         };
 
+        $scope.checkPartList = function (partList, extParticipantIndex) {
+            var isValid = false;
+
+            partList.forEach(function(checked, i, arr) {
+                isValid = isValid || checked;
+            });
+
+            if (!isValid) {
+                partList[extParticipantIndex] = true;
+                alert('Нельзя отменить участие в одном и том же расходе для всех участников');
+            }
+        };
+
 
 
 
@@ -447,10 +462,33 @@
             });
         }, true);
 
+        $scope.copyObjectToBuffer = function () {
+            var objectDiv = document.getElementById('angularObject');
+            var range = document.createRange();
+            range.selectNode(objectDiv);
+            var selection = window.getSelection();
+            selection.addRange(range);
+
+            try {
+                // Теперь, когда мы выбрали текст ссылки, выполним команду копирования
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'successful' : 'unsuccessful';
+                console.log('Copy object command was ' + msg);
+            } catch(err) {
+                console.log('Oops, unable to copy');
+            }
+
+            // Снятие выделения - ВНИМАНИЕ: вы должны использовать
+            // removeRange(range) когда это возможно
+            window.getSelection().removeAllRanges();
+            // window.getSelection().removeRange(range);
+            selection.removeAllRanges();
+        };
+
 
         console.log($scope);
 
-        if (false) {
+        if (true) {
             $scope.expCalc = getDataService;
         } else {
             $scope.expCalc = {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,1.1934,0.0174,0.5186],[0.8379,1,0.0146,0.4345],[57.322,68.4158,1,29.7271],[1.928,2.2963,0.0336,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет","total":74.208,"fullRefund":-15.466800000000003},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"1","total":21,"share":10.6416,"balance":10.3584,"receivedSum":0,"givenSum":0,"fullBalance":10.36},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Tue Sep 05 2017 17:52:37 GMT+0300 (Belarus Standard Time)","value":21,"currency":"3","partList":[false,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":21.208,"share":31.7832,"balance":-10.575200000000002,"receivedSum":0,"givenSum":0,"fullBalance":-10.58},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Tue Sep 05 2017 17:52:42 GMT+0300 (Belarus Standard Time)","value":11,"currency":"0","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"0","total":21,"share":15.8916,"balance":5.1084,"receivedSum":0,"givenSum":0,"fullBalance":5.11},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Tue Sep 05 2017 17:52:44 GMT+0300 (Belarus Standard Time)","value":21,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":11,"share":15.8916,"balance":-4.8916,"receivedSum":0,"givenSum":0,"fullBalance":-4.89},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Tue Sep 05 2017 17:52:48 GMT+0300 (Belarus Standard Time)","value":11,"currency":"3","partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}}]}]}

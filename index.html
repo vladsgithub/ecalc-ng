@@ -111,10 +111,11 @@
 											</button>
 										</div>
 										<div class="flex-grow1">
-											<input class="form-control" type="text" ng-model="expense.title" placeholder="Новый расход">
+											<input class="form-control" type="text" ng-model="expense.title" placeholder="Новый расход"
+												   ng-disabled="expense.isPaid">
 										</div>
 										<div>
-											<select class="form-control" ng-model="expense.type">
+											<select class="form-control" ng-model="expense.type" ng-disabled="expense.isPaid">
 												<option ng-repeat="expensesType in expCalc.settings.expensesTypes track by $index"
 														value="{{$index}}" ng-selected="expense.type == $index">
 													{{expensesType.name}}
@@ -127,12 +128,17 @@
 										<div class="date">{{formatDate(expense.date)}}</div>
 										<div class="currency">
 											<select class="form-control currency-select" ng-model="expense.currency"
-													ng-options="key as value for (key, value) in expCalc.settings.currencies.names">
+													ng-options="key as value for (key, value) in expCalc.settings.currencies.names"
+													ng-disabled="expense.isPaid">
 											</select>
 										</div>
 										<div class="flex-grow1">
 											<input class="form-control" type="number" placeholder="сумма"
-												   ng-model="expense.value">
+												   ng-model="expense.value"
+												   ng-disabled="expense.isPaid">
+										</div>
+										<div>
+											<input type="checkbox" class="big-checkbox" ng-model="expense.isPaid" />
 										</div>
 									</div>
 								</li>
@@ -172,7 +178,7 @@
 						<span>Сумма расходов:</span>
 						<span class="float-right text-uppercase">
 							<b>
-								{{getAccountTotal(account)}}
+								{{roundOff(getAccountTotal(account))}}
 								{{getAccountCurrency()}}
 							</b>
 						</span>
@@ -181,7 +187,7 @@
 						<span>Сумма долей:</span>
 						<span class="float-right text-uppercase">
 							<b>
-								{{getShareTotal(account)}}
+								{{roundOff(getShareTotal(account))}}
 								{{getAccountCurrency()}}
 							</b>
 						</span>
@@ -189,7 +195,7 @@
 					<h5 class="margin5-0 warning clearfix">
 						<span>Погрешность расчетов:</span>
 						<span class="float-right">
-							<b>{{getAccountTotal(account) - getShareTotal(account)}}</b>
+							<b>{{roundOff(getAccountTotal(account) - getShareTotal(account))}}</b>
 						</span>
 					</h5>
 
@@ -226,13 +232,14 @@
 							<ul class="part-list">
 								<li class="bg" ng-repeat="intParticipant in account.participants track by $index">
 									<hr/>
-									{{intParticipant.meta.title}}<br/>
 
 									<ul class="part-list">
 										<li class="padding5-0 clearfix" ng-repeat="expense in intParticipant.expenses track by $index">
 											<label>
-												<input type="checkbox" ng-model="expense.partList[extParticipantIndex]">
-												{{expense.title}}
+												<input type="checkbox" class="big-checkbox"
+													   ng-model="expense.partList[extParticipantIndex]"
+													   ng-change="checkPartList(expense.partList, extParticipantIndex)">
+												{{expense.title}} ({{intParticipant.meta.title}})
 											</label>
 
 											<span class="float-right text-uppercase">
@@ -262,7 +269,9 @@
 					</h5>
 
 
-					<div class="fixation-directly" ng-if="account.settings.fixationDirectly">
+					<div class="fixation-directly"
+						 ng-class="(account.meta.negativeFullBalance && account.meta.positiveFullBalance) ? '' : 'completed'"
+						 ng-if="account.settings.fixationDirectly">
 
 						<ul class="participants">
 							<li class="padding5-0" ng-repeat="participant in account.participants track by $index"
@@ -339,16 +348,14 @@
 													   ng-change="checkRefundFields(refund)" />
 											</div>
 										</div>
-
-										<div ng-if="refund.reserve > 0">
-											В резерве: {{refund.reserve}}
+										<div class="text-right">
+											{{formatDate(refund.date)}}
 										</div>
 
 									</li>
 
-									<li class="bg padding5-0">
-										<button class="btn btn-primary" ng-click="addNewPayment(participant)"
-												ng-if="isAllRefundsFixed(participant)">
+									<li class="bg padding5-0" ng-if="isAllRefundsFixed(participant)">
+										<button class="btn btn-primary" ng-click="addNewPayment(participant)">
 											<i class="fa fa-plus"></i>
 										</button>
 										Сделать новый взнос
@@ -371,8 +378,19 @@
 
 
 
+
+
+
+
+
+
 	<div id="testing" class="testing"></div>
-	<div>{{expCalc}}</div>
+
+	<div class="padding5-0">
+		<br/>
+		<button class="margin5-0" ng-click="copyObjectToBuffer()">Скопировать объект данных в буфер</button>
+		<div id="angularObject">{{expCalc}}</div>
+	</div>
 </main>
 
 </body>
