@@ -45,6 +45,7 @@ ol, ul {
 
 /*=== App styles ===*/
 .testing {
+	display: none;
 	position: fixed;
 	top: 0;
 	right: 0;
@@ -53,6 +54,9 @@ ol, ul {
 	padding: 20px;
 	overflow: auto;
 	background: aliceblue;
+}
+[data-object-toggle]:checked ~ .testing {
+	display: block;
 }
 .testing div {
 	padding-top: 5px;
@@ -86,8 +90,13 @@ html {
 	font-size: 14px;
 }
 body {
-	width: 75%;
 	font-size: 1.2rem;
+}
+.wrap {
+
+}
+[data-object-toggle]:checked + .wrap {
+	width: 75%;
 }
 header {
 	padding: 10px;
@@ -104,12 +113,28 @@ header {
 input:checked + .currencies-box {
 	display: block;
 }
-.currencies-box th input {
-	background: #a5ffac;
-	font-weight: bold;
+.currency-bg {
+	background: #9ff3ff;
+	text-align: center;
+	font-weight: normal;
+	font-size: 14px;
+}
+.currencies-box th {
+	text-align: center;
+}
+.secondary-currencies {
+	font-weight: normal;
+	text-transform: uppercase;
 }
 .currencies-box td {
 	text-transform: uppercase;
+}
+.currencies-box td:nth-child(2) {
+	font-weight: bold;
+	text-align: center;
+}
+.currencies-box td:nth-child(2) input {
+	font-weight: bold;
 }
 .currencies-box input {
 	min-width: 100px;

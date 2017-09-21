@@ -99,6 +99,19 @@
 
 
         // METHODS OF ADDING ===============================
+        $scope.addNewCurrency = function () {
+            var newRateArr = [];
+
+            $scope.expCalc.settings.currencies.names.push('');
+            $scope.expCalc.settings.currencies.rates.forEach(function(rateArr, i, arr) {
+                rateArr.push(null);
+                newRateArr.push(null);
+            });
+            newRateArr.push(null);
+
+            $scope.expCalc.settings.currencies.rates.push( newRateArr );
+        };
+
         $scope.addNewExpense = function (obj) {
             // todo: probably rework this method - it could receive objects: account, participant
 
@@ -472,10 +485,13 @@
             try {
                 // Теперь, когда мы выбрали текст ссылки, выполним команду копирования
                 var successful = document.execCommand('copy');
-                var msg = successful ? 'successful' : 'unsuccessful';
-                console.log('Copy object command was ' + msg);
+                var msg = successful ? 'УСПЕШНО' : 'ПЛОХО!!!';
+                var selectedObject = selection.toString();
+
+                msg = (selectedObject.length) ? msg : 'неудачно. Повторите попытку копирования';
+                alert('Объект скопировался ' + msg + ': ' + selectedObject);
             } catch(err) {
-                console.log('Oops, unable to copy');
+                alert('Проблема с копированием');
             }
 
             // Снятие выделения - ВНИМАНИЕ: вы должны использовать

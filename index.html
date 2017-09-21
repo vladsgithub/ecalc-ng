@@ -13,6 +13,9 @@
 </head>
 <body ng-app="app" ng-controller="calculatorCtrl">
 
+<input type="checkbox" class="big-checkbox float-left" data-object-toggle style="margin: 15px;" />
+
+<div class="wrap">
 <header>
 	<span ng-repeat="account in expCalc.accounts track by $index">
 		<button class="btn btn-primary"
@@ -34,17 +37,39 @@
 				<thead>
 				<tr>
 					<th> </th>
-					<th ng-repeat="name in currencies.names track by $index">
-						<input type="text" class="form-control" ng-model="currencies.names[$index]" />
+					<th>Основная валюта</th>
+					<th class="secondary-currencies currency-bg" ng-repeat="name in currencies.names track by $index">
+						{{currencies.names[$index]}}
+						<!--<input type="text" class="form-control currency-bg" ng-model="currencies.names[$index]" />-->
 					</th>
+				</tr>
+				<tr>
+					<th> </th>
+					<th> </th>
+					<th class="currency-bg" colspan="100">Курс, по которому покупается указанная валюта</th>
 				</tr>
 				</thead>
 
 				<tbody>
 				<tr ng-repeat="name in expCalc.settings.currencies.names track by $index" ng-init="nameIndex = $index">
-					<td>{{name}}</td>
+					<td>
+						<button class="btn btn-danger" ng-click="removeCurrency()">
+							<i class="fa fa-minus"></i>
+						</button>
+					</td>
+					<td>
+						<input type="text" class="form-control" ng-model="expCalc.settings.currencies.names[$index]" />
+					</td>
 					<td ng-repeat="array in currencies.rates[nameIndex] track by $index">
 						<input type="number" class="form-control" ng-model="currencies.rates[nameIndex][$index]" />
+					</td>
+				</tr>
+				<tr>
+					<td> </td>
+					<td>
+						<button class="btn btn-primary" ng-click="addNewCurrency()">
+							<i class="fa fa-plus"></i>
+						</button>
 					</td>
 				</tr>
 				</tbody>
@@ -66,6 +91,13 @@
 						<input class="form-control inline-block" ng-model="account.meta.title" data-account-index="$index">
 					</label>
 					<button class="btn btn-danger btn-sm" ng-click="removeAccount(this)">Удалить расчет</button>
+
+					<label class="float-right">
+						<div>Основная валюта в расчетах: </div>
+						<select class="form-control currency-select float-right" ng-model="account.settings.accountCurrency"
+								ng-options="key as value for (key, value) in expCalc.settings.currencies.names">
+						</select>
+					</label>
 				</h5>
 			</header>
 
@@ -376,22 +408,21 @@
 		</li>
 	</ul>
 
+</main>
 
 
 
 
 
 
-
-
-	<div id="testing" class="testing"></div>
-
-	<div class="padding5-0">
-		<br/>
-		<button class="margin5-0" ng-click="copyObjectToBuffer()">Скопировать объект данных в буфер</button>
+	<div style="padding: 30px 15px 10px;">
+		<button class="btn-lg margin5-0" ng-click="copyObjectToBuffer()">Скопировать объект данных в буфер</button>
 		<div id="angularObject">{{expCalc}}</div>
 	</div>
-</main>
+</div>
+
+<div id="testing" class="testing"></div>
+
 
 </body>
 </html>
