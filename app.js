@@ -17,7 +17,7 @@
                     fixationDirectly: true
                 },
                 meta: {
-                    title: 'Новый расчет', //'Новый расчет ' + accountIndex,
+                    title: 'Новый расчет ' + accountIndex,
                     total: 0,
                     fullRefund: 0
                 },
@@ -25,16 +25,17 @@
             };
 
             accounts.push(newAccount);
+            $scope.expCalc.settings.currentAccount = accountIndex;
 
-            $scope.createParticipant(accountIndex);
+            $scope.createParticipant();
         };
 
-        $scope.createParticipant = function (accountIndex) {
-            // todo: probably rework this method - it could receive objects: account
-            var participantIndex = $scope.expCalc.accounts[accountIndex].participants.length;
+        $scope.createParticipant = function () {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+            var participantIndex = currentAccount.participants.length;
             var newParticipant = {
                 meta: {
-                    title: 'Участник ' + accountIndex + '.' + participantIndex,
+                    title: 'Участник ' + $scope.expCalc.settings.currentAccount + '.' + participantIndex,
                     participation: 1,
                     preferredCurrency: $scope.expCalc.settings.baseCurrency,
                     total: 0,
@@ -50,9 +51,9 @@
                 }
             };
 
-            $scope.expCalc.accounts[accountIndex].participants.push(newParticipant);
+            currentAccount.participants.push(newParticipant);
 
-            $scope.addParticipantToPartList($scope.expCalc.accounts[accountIndex]);
+            $scope.addParticipantToPartList();
         };
 
 
@@ -61,28 +62,27 @@
 
 
         // METHODS OF REMOVING ===============================
-        $scope.removeAccount = function (obj) {
-            $scope.expCalc.accounts.splice(obj.$index, 1);
+        $scope.removeCurrentAccount = function () {
+            $scope.expCalc.accounts.splice($scope.expCalc.settings.currentAccount, 1);
         };
 
-        $scope.removeParticipant = function (obj) {
-            var accountIndex = obj.$parent.$parent.$index;
-            var participantIndex = obj.$index;
+        $scope.removeParticipant = function (participantIndex) {
+            var accountIndex = $scope.expCalc.settings.currentAccount;
 
             $scope.expCalc.accounts[accountIndex].participants.splice(participantIndex, 1);
-            $scope.removeParticipantFromPartList($scope.expCalc.accounts[accountIndex], participantIndex);
+            $scope.removeParticipantFromPartList(participantIndex);
         };
 
-        $scope.removeExpense = function (obj) {
-            var accountIndex = obj.$parent.$parent.$parent.$index;
-            var participantIndex = obj.$parent.$index;
-            var expenseIndex = obj.$index;
+        $scope.removeExpense = function (participantIndex, expenseIndex) {
+            var accountIndex = $scope.expCalc.settings.currentAccount;
 
             $scope.expCalc.accounts[accountIndex].participants[participantIndex].expenses.splice(expenseIndex, 1);
         };
 
-        $scope.removeParticipantFromPartList = function (account, participantIndex) {
-            account.participants.forEach(function (participant, i, arr) {
+        $scope.removeParticipantFromPartList = function (participantIndex) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+
+            currentAccount.participants.forEach(function (participant, i, arr) {
                 participant.expenses.forEach(function (expense, i, arr) {
                     expense.partList.splice(participantIndex, 1);
                 });
@@ -112,18 +112,16 @@
             $scope.expCalc.settings.currencies.rates.push( newRateArr );
         };
 
-        $scope.addNewExpense = function (obj) {
-            // todo: probably rework this method - it could receive objects: account, participant
-
-            var accountIndex = obj.$parent.$parent.$index;
-            var participantIndex = obj.$index;
-            var expenseIndex = obj.participant.expenses.length;
+        $scope.addNewExpense = function (participant, participantIndex) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+            var accountIndex = $scope.expCalc.settings.currentAccount;
+            var expenseIndex = participant.expenses.length;
             var newExpense = {
                 title: 'Расход ' + accountIndex + '.' + participantIndex + '.' + expenseIndex,
                 type: '0',
                 date: '' + new Date(),
                 value: null,
-                currency: obj.$parent.$parent.account.settings.accountCurrency,
+                currency: currentAccount.settings.accountCurrency,
                 isPaid: false,
                 partList: []
             };
@@ -132,11 +130,13 @@
                 newExpense.partList.push(true);
             });
 
-            obj.participant.expenses.push(newExpense);
+            participant.expenses.push(newExpense);
         };
 
-        $scope.addParticipantToPartList = function (account) {
-            account.participants.forEach(function (participant, i, arr) {
+        $scope.addParticipantToPartList = function () {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+
+            currentAccount.participants.forEach(function (participant, i, arr) {
                 participant.expenses.forEach(function (expense, i, arr) {
                     expense.partList.push(true);
                 });
@@ -174,18 +174,21 @@
             return $scope.expCalc.settings.currencies.names[currentAccount.settings.accountCurrency];
         };
 
-        $scope.getAccountTotal = function (account) {
-            account.meta.total = 0;
+        $scope.getAccountTotal = function () {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
 
-            account.participants.forEach(function (participant, i, arr) {
-                account.meta.total += participant.meta.total;
+            currentAccount.meta.total = 0;
+
+            currentAccount.participants.forEach(function (participant, i, arr) {
+                currentAccount.meta.total += participant.meta.total;
             });
 
-            return account.meta.total;
+            return currentAccount.meta.total;
         };
 
-        $scope.getParticipantTotal = function (account, participant) {
-            var rates = $scope.expCalc.settings.currencies.rates[account.settings.accountCurrency];
+        $scope.getParticipantTotal = function (participant) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+            var rates = $scope.expCalc.settings.currencies.rates[currentAccount.settings.accountCurrency];
 
             participant.meta.total = 0;
 
@@ -214,58 +217,64 @@
             return $scope.getMoneyByAccountCurrency(expense.value, expense.currency);
         };
 
-        $scope.getPartSumOfExpense = function (account, expense) {
-            var partSumOfExpense = 0;
+        $scope.getPartSumOfExpense = function (expense) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                partSumOfExpense = 0;
 
             expense.partList.forEach(function (participation, i, arr) {
                 if (participation) {
-                    partSumOfExpense += account.participants[i].meta.participation;
+                    partSumOfExpense += currentAccount.participants[i].meta.participation;
                 }
             });
 
             return partSumOfExpense;
         };
 
-        $scope.getExpenseShare = function (account, expense, extParticipantIndex) {
+        $scope.getExpenseShare = function (expense, extParticipantIndex) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+
             if (expense.isPaid) return expense.partList[extParticipantIndex] *
-                account.participants[extParticipantIndex].meta.participation *
+                currentAccount.participants[extParticipantIndex].meta.participation *
                 $scope.getExpenseWithRate(expense) /
-                $scope.getPartSumOfExpense(account, expense);
+                $scope.getPartSumOfExpense(expense);
         };
 
-        $scope.getParticipantShare = function (account, extParticipantIndex) {
-            var participantShare = 0;
+        $scope.getParticipantShare = function (extParticipantIndex) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                participantShare = 0;
 
-            account.participants.forEach(function (participant, i, arr) {
+            currentAccount.participants.forEach(function (participant, i, arr) {
                 participant.expenses.forEach(function (expense, i, arr) {
-                    if (expense.isPaid) participantShare += $scope.getExpenseShare(account, expense, extParticipantIndex);
+                    if (expense.isPaid) participantShare += $scope.getExpenseShare(expense, extParticipantIndex);
                 });
             });
 
-            account.participants[extParticipantIndex].meta.share = participantShare;
+            currentAccount.participants[extParticipantIndex].meta.share = participantShare;
 
             return participantShare;
         };
 
-        $scope.getShareTotal = function (account) {
-            var shareTotal = 0;
+        $scope.getShareTotal = function () {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                shareTotal = 0;
 
-            account.participants.forEach(function (participant, i, arr) {
-                shareTotal += account.participants[i].meta.share;
+            currentAccount.participants.forEach(function (participant, i, arr) {
+                shareTotal += currentAccount.participants[i].meta.share;
             });
 
             return shareTotal;
         };
 
-        $scope.getFullRefund = function (account) {
+        $scope.getFullRefund = function () {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
             var balance, fullRefund = 0;
 
-            account.participants.forEach(function (participant, i, arr) {
+            currentAccount.participants.forEach(function (participant, i, arr) {
                 balance = participant.meta.total - participant.meta.share;
                 fullRefund += (balance < 0) ? balance : 0;
             });
 
-            account.meta.fullRefund = fullRefund;
+            currentAccount.meta.fullRefund = fullRefund;
 
             return fullRefund;
         };
@@ -291,10 +300,12 @@
             return option;
         };
 
-        $scope.getReceivedSum = function (account, participant, participantIndex) {
+        $scope.getReceivedSum = function (participant, participantIndex) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+
             participant.meta.receivedSum = 0;
 // console.log('-----------', participant.meta.title);
-            account.participants.forEach(function(person, i, arr) {
+            currentAccount.participants.forEach(function(person, i, arr) {
                 person.fixation.whom.forEach(function(refund, n, arr) {
                     if (refund.isFixed && participantIndex == refund.number && refund.number !== null && refund.currency !== null) {
 // console.log(participant.meta.receivedSum , ' += ', $scope.getMoneyByAccountCurrency(refund.value, refund.currency));
@@ -329,7 +340,7 @@
             var sponsorWillReceive, debtorWillGive, preferredCurrencyRest, accountCurrencyRest;
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
                 accountCurrency = currentAccount.settings.accountCurrency,
-                isRoundDown = (sponsor.meta.preferredCurrency == accountCurrency) ? false : true;
+                isRoundDown = (sponsor.meta.preferredCurrency != accountCurrency);
 
             sponsorWillReceive = sponsor.meta.balance - sponsor.meta.receivedSum;
             debtorWillGive = Math.abs(debtor.meta.balance + debtor.meta.givenSum);
@@ -347,7 +358,7 @@
         $scope.getParticipantFullBalance = function (participant, participantIndex, byPrefferedCurrency) {
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
                 participantBalance = $scope.roundOff(participant.meta.balance),
-                participantReceivedSum = $scope.getReceivedSum(currentAccount, participant, participantIndex),
+                participantReceivedSum = $scope.getReceivedSum(participant, participantIndex),
                 participantGivenSum = $scope.getGivenSum(participant),
                 calculation = participantBalance - participantReceivedSum + participantGivenSum,
                 result = $scope.roundOff(calculation),
@@ -403,8 +414,9 @@
             }
         };
 
-        $scope.fillRefundFields = function (account, debtor, refund) {
-            var sponsor = account.participants[refund.number],
+        $scope.fillRefundFields = function (debtor, refund) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                sponsor = currentAccount.participants[refund.number],
                 value = $scope.getRest(sponsor, debtor).rest;
 
             refund.value = (debtor.meta.fullBalance < 0 && value > 0) ? value : null;
@@ -446,6 +458,16 @@
                 partList[extParticipantIndex] = true;
                 alert('Нельзя отменить участие в одном и том же расходе для всех участников');
             }
+        };
+
+        $scope.isMainCurrency = function (currencyIndex) {
+            var result = false;
+
+            $scope.expCalc.accounts.forEach(function(account, i, arr) {
+                result = result || (currencyIndex == account.settings.accountCurrency);
+            });
+
+            return result;
         };
 
 

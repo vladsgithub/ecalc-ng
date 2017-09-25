@@ -21,7 +21,7 @@
 		<button class="btn btn-primary"
 				ng-class="{'active': expCalc.settings.currentAccount==$index}"
 				ng-click="expCalc.settings.currentAccount=$index">
-			{{$index}} - {{account.meta.title}}
+			{{account.meta.title}}
 		</button>
 	</span>
 	<button class="btn btn-primary" ng-click="createAccount()">
@@ -53,7 +53,7 @@
 				<tbody>
 				<tr ng-repeat="name in expCalc.settings.currencies.names track by $index" ng-init="nameIndex = $index">
 					<td>
-						<button class="btn btn-danger" ng-click="removeCurrency()">
+						<button class="btn btn-danger" ng-click="removeCurrency()" ng-disabled="isMainCurrency(nameIndex)">
 							<i class="fa fa-minus"></i>
 						</button>
 					</td>
@@ -90,7 +90,7 @@
 						<div>Название расчёта:</div>
 						<input class="form-control inline-block" ng-model="account.meta.title" data-account-index="$index">
 					</label>
-					<button class="btn btn-danger btn-sm" ng-click="removeAccount(this)">Удалить расчет</button>
+					<button class="btn btn-danger btn-sm" ng-click="removeCurrentAccount()">Удалить расчет</button>
 
 					<label class="float-right">
 						<div>Основная валюта в расчетах: </div>
@@ -109,17 +109,18 @@
 						<span class="flex-grow1">Всего расходов:</span>
 						<span class="text-uppercase">
 							<b>
-								{{roundOff(getAccountTotal(account))}}
+								{{roundOff(getAccountTotal())}}
 								{{getAccountCurrency()}}
 							</b>
 						</span>
 					</h5>
 
 					<ul class="participants">
-						<li class="padding5-0" ng-repeat="participant in account.participants track by $index">
+						<li class="padding5-0" ng-repeat="participant in account.participants track by $index"
+							ng-init="participantIndex = $index">
 							<div class="flex padding5-0 bg">
 								<div>
-									<button class="btn btn-danger" ng-click="removeParticipant(this)">
+									<button class="btn btn-danger" ng-click="removeParticipant(participantIndex)">
 										<i class="fa fa-minus"></i>
 									</button>
 								</div>
@@ -128,17 +129,18 @@
 								</div>
 								<div>
 									<h5 class="nowrap text-uppercase">
-										{{roundOff(getParticipantTotal(account, participant))}}
+										{{roundOff(getParticipantTotal(participant))}}
 										{{getAccountCurrency()}}
 									</h5>
 								</div>
 							</div>
 
 							<ul class="expenses">
-								<li class="padding5-0 bg" ng-repeat="expense in participant.expenses track by $index">
+								<li class="padding5-0 bg" ng-repeat="expense in participant.expenses track by $index"
+									ng-init="expenseIndex = $index">
 									<div class="flex">
 										<div>
-											<button class="btn btn-danger" ng-click="removeExpense(this)">
+											<button class="btn btn-danger" ng-click="removeExpense(participantIndex, expenseIndex)">
 												<i class="fa fa-minus"></i>
 											</button>
 										</div>
@@ -176,7 +178,7 @@
 								</li>
 
 								<li class="padding5-0 bg">
-									<button class="btn btn-primary" ng-click="addNewExpense(this)">
+									<button class="btn btn-primary" ng-click="addNewExpense(participant, participantIndex)">
 										<i class="fa fa-plus"></i>
 									</button>
 									Добавить новый расход
@@ -185,7 +187,7 @@
 						</li>
 
 						<li class="padding5-0">
-							<button class="btn btn-primary" ng-click="createParticipant(expCalc.accounts.indexOf(account))">
+							<button class="btn btn-primary" ng-click="createParticipant()">
 								<i class="fa fa-plus"></i>
 							</button>
 							Добавить нового участника
@@ -201,7 +203,7 @@
 						<span class="flex-grow1">Весь возврат:</span>
 						<span class="text-uppercase">
 							<b>
-								{{roundOff(getFullRefund(account))}}
+								{{roundOff(getFullRefund())}}
 								{{getAccountCurrency()}}
 							</b>
 						</span>
@@ -210,7 +212,7 @@
 						<span>Сумма расходов:</span>
 						<span class="float-right text-uppercase">
 							<b>
-								{{roundOff(getAccountTotal(account))}}
+								{{roundOff(getAccountTotal())}}
 								{{getAccountCurrency()}}
 							</b>
 						</span>
@@ -219,7 +221,7 @@
 						<span>Сумма долей:</span>
 						<span class="float-right text-uppercase">
 							<b>
-								{{roundOff(getShareTotal(account))}}
+								{{roundOff(getShareTotal())}}
 								{{getAccountCurrency()}}
 							</b>
 						</span>
@@ -227,7 +229,7 @@
 					<h5 class="margin5-0 warning clearfix">
 						<span>Погрешность расчетов:</span>
 						<span class="float-right">
-							<b>{{roundOff(getAccountTotal(account) - getShareTotal(account))}}</b>
+							<b>{{roundOff(getAccountTotal() - getShareTotal())}}</b>
 						</span>
 					</h5>
 
@@ -255,7 +257,7 @@
 								<div class="share">
 									<h5>Доля</h5>
 									<h5 class="text-uppercase">
-										{{roundOff(getParticipantShare(account, extParticipantIndex))}}
+										{{roundOff(getParticipantShare(extParticipantIndex))}}
 										{{getAccountCurrency()}}
 									</h5>
 								</div>
@@ -275,7 +277,7 @@
 											</label>
 
 											<span class="float-right text-uppercase">
-												<b>{{roundOff(getExpenseShare(account, expense, extParticipantIndex))}}</b>
+												<b>{{roundOff(getExpenseShare(expense, extParticipantIndex))}}</b>
 											</span>
 										</li>
 									</ul>
@@ -349,7 +351,7 @@
 											<div>
 												<select class="form-control paddingD-0" style="min-width: 110px;"
 														ng-model="refund.number"
-														ng-change="fillRefundFields(account, participant, refund)"
+														ng-change="fillRefundFields(participant, refund)"
 														ng-disabled="refund.isFixed">
 													<option value="" hidden disabled selected>Выберите участника</option>
 
