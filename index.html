@@ -53,7 +53,7 @@
 				<tbody>
 				<tr ng-repeat="name in expCalc.settings.currencies.names track by $index" ng-init="nameIndex = $index">
 					<td>
-						<button class="btn btn-danger" ng-click="removeCurrency(nameIndex)" ng-disabled="isMainCurrency(nameIndex)">
+						<button class="btn btn-danger" ng-click="removeCurrency(nameIndex)">
 							<i class="fa fa-minus"></i>
 						</button>
 					</td>
