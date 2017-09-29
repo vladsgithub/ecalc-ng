@@ -68,7 +68,32 @@
             if (error) {
                 alert(error);
             } else {
-                alert('OK');
+
+                if ($scope.expCalc.settings.baseCurrency > currencyIndex) --$scope.expCalc.settings.baseCurrency;
+
+                $scope.expCalc.accounts.forEach(function(account, accountIndex, accountArr) {
+
+                    if (account.settings.accountCurrency > currencyIndex) --account.settings.accountCurrency;
+
+                    account.participants.forEach(function(participant, participantIndex, participantArr) {
+
+                        if (participant.meta.preferredCurrency > currencyIndex) --participant.meta.preferredCurrency;
+
+                        participant.expenses.forEach(function(expense, expenseIndex, expenseArr) {
+                            if (expense.currency > currencyIndex) --expense.currency;
+                        });
+                        participant.fixation.whom.forEach(function(whom, whomIndex, whomArr) {
+                            if (whom.currency > currencyIndex) --whom.currency;
+                        });
+
+                    });
+                });
+
+                $scope.expCalc.settings.currencies.names.splice(currencyIndex, 1);
+                $scope.expCalc.settings.currencies.rates.splice(currencyIndex, 1);
+                $scope.expCalc.settings.currencies.rates.forEach(function(rateArr, i, arr) {
+                    rateArr.splice(currencyIndex, 1);
+                });
             }
         };
 
@@ -471,8 +496,9 @@
         };
 
         $scope.isCurrencyUsed = function (currencyIndex) {
-            var message, errors, errorAccountTitle, errorParticipantTitle, preferredCurrencyError, whomCurrencyError, expensesError;
+            var message, errorAccountTitle, errorParticipantTitle, preferredCurrencyError, whomCurrencyError, expensesError;
             var result = '',
+                errors = [],
                 tempArr = [],
                 removeCurrency = $scope.expCalc.settings.currencies.names[currencyIndex].toUpperCase();
 
@@ -481,7 +507,7 @@
             });
 
             if (tempArr.length) {
-                result = 'Валюта ' + removeCurrency + ' используется в качестве основной в следующих расчетах:\n';
+                result = 'Валюта ' + removeCurrency + ' используется как основная в расчетах:\n';
                 result += tempArr.join('; ');
                 result += '\n';
             }
@@ -498,8 +524,7 @@
             // var expensesArr = [];
 
             $scope.expCalc.accounts.forEach(function(account, accountIndex, accountArr) {
-                errors = [];
-                errorAccountTitle = '[ ' + account.meta.title + '; ';
+                errorAccountTitle = '\n[ ' + account.meta.title + '; ';
 
                 account.participants.forEach(function(participant, participantIndex, participantArr) {
                     errorParticipantTitle = participant.meta.title + ' ]\n';
