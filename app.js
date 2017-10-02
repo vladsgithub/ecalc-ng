@@ -68,22 +68,31 @@
             if (error) {
                 alert(error);
             } else {
-
-                if ($scope.expCalc.settings.baseCurrency > currencyIndex) --$scope.expCalc.settings.baseCurrency;
+                if ($scope.expCalc.settings.baseCurrency > currencyIndex) {
+                    $scope.expCalc.settings.baseCurrency = ($scope.expCalc.settings.baseCurrency - 1).toString();
+                }
 
                 $scope.expCalc.accounts.forEach(function(account, accountIndex, accountArr) {
 
-                    if (account.settings.accountCurrency > currencyIndex) --account.settings.accountCurrency;
+                    if (account.settings.accountCurrency > currencyIndex) {
+                        account.settings.accountCurrency = (account.settings.accountCurrency - 1).toString();
+                    }
 
                     account.participants.forEach(function(participant, participantIndex, participantArr) {
 
-                        if (participant.meta.preferredCurrency > currencyIndex) --participant.meta.preferredCurrency;
+                        if (participant.meta.preferredCurrency > currencyIndex) {
+                            participant.meta.preferredCurrency = (participant.meta.preferredCurrency - 1).toString();
+                        }
 
                         participant.expenses.forEach(function(expense, expenseIndex, expenseArr) {
-                            if (expense.currency > currencyIndex) --expense.currency;
+                            if (expense.currency > currencyIndex) {
+                                expense.currency = (expense.currency - 1).toString();
+                            }
                         });
                         participant.fixation.whom.forEach(function(whom, whomIndex, whomArr) {
-                            if (whom.currency > currencyIndex) --whom.currency;
+                            if (whom.currency > currencyIndex) {
+                                whom.currency = (whom.currency - 1).toString();
+                            }
                         });
 
                     });
