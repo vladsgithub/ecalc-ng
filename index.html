@@ -302,6 +302,12 @@
 						</span>
 					</h5>
 
+					<div class="padding10-0">
+						<label>
+							<input type="checkbox" class="big-checkbox" ng-model="account.settings.fixationDirectly" />
+							Расчет напрямую
+						</label>
+					</div>
 
 					<div class="fixation-directly"
 						 ng-class="(account.meta.negativeFullBalance && account.meta.positiveFullBalance) ? '' : 'completed'"
