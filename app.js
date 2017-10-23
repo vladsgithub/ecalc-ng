@@ -42,12 +42,15 @@
                     share: 0,
                     balance: 0,
                     receivedSum: 0,
-                    givenSum: 0
+                    givenSum: 0,
+                    fullBalance: 0,
+                    fullBalanceByBank: 0
                 },
                 expenses: [],
                 fixation: {
                     whom: [],
-                    byBank: [] // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
+                    byBank: [], // it will be added objects: { value: null, reserve: null, date: null} (participants can return money by some parts)
+                    reserve: 0
                 }
             };
 
@@ -142,6 +145,10 @@
             debtor.fixation.whom.splice(refundIndex, 1);
         };
 
+        $scope.removePaymentByBank = function (participant, byBankObjectIndex) {
+            participant.fixation.byBank.splice(byBankObjectIndex, 1);
+        };
+
 
 
 
@@ -206,6 +213,18 @@
                 number: null,
                 value: null,
                 currency: null,
+                date: '' + new Date(),
+                isFixed: false
+            });
+        };
+
+        $scope.addNewPaymentByBank = function(participant, direction) {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
+            var value = (currentAccount.meta.bank < participant.meta.fullBalanceByBank) ? currentAccount.meta.bank : participant.meta.fullBalanceByBank;
+
+            participant.fixation.byBank.push({
+                token: direction,
+                value: (direction > 0) ? value : (participant.meta.fullBalanceByBank < 0) ? -participant.meta.fullBalanceByBank : null,
                 date: '' + new Date(),
                 isFixed: false
             });
@@ -420,7 +439,7 @@
             return (byPrefferedCurrency) ? $scope.roundOff(resultByPrefferedCurrency, true) : result;
         };
 
-        $scope.getReturnsBalance = function () {
+        $scope.getReturnsBalance = function (method) {
             var positive = 0,
                 negative = 0,
                 currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
@@ -439,6 +458,35 @@
 
             return currentAccount.meta.negativeFullBalance + ' / ' + currentAccount.meta.positiveFullBalance;
         };
+
+        $scope.getAccountBank = function () {
+            var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
+                result = 0;
+
+            currentAccount.participants.forEach(function(participant, participantIndex, arr) {
+                participant.fixation.byBank.forEach(function(byBankObject, i, arr2) {
+                    result += (-1) * byBankObject.token * byBankObject.value;
+                });
+            });
+
+            currentAccount.meta.bank = $scope.roundOff(result);
+
+            return currentAccount.meta.bank;
+        };
+
+        $scope.getParticipantFullBalanceByBank = function (participant) {
+            var result = 0;
+
+            participant.fixation.byBank.forEach(function(byBankObject, i, arr) {
+                result += byBankObject.token * byBankObject.value;
+            });
+
+            participant.meta.fullBalanceByBank = $scope.roundOff(participant.meta.balance - result);
+
+            return participant.meta.fullBalanceByBank;
+        };
+
+
 
 
 
@@ -575,7 +623,7 @@
                 result = 'Валюта ' + removeCurrency + ' не может быть удалена по следующим причинам:\n' + result + errors.join('\n');
             }
 
-            alert('Необходимо еще проверить массив возвратов через общий банк');
+            alert('ошибка: Необходимо еще проверить массив возвратов через общий банк');
             return result;
         };
 
@@ -602,7 +650,7 @@
                 result = 'Невозможно удалить участника по следующим причинам:\n' + givenPaymentError + receivedPaymentError;
             }
 
-            alert('Необходимо еще проверить массив возвратов через общий банк');
+            alert('ошибка: Необходимо еще проверить массив возвратов через общий банк');
             return result;
         };
 
@@ -668,7 +716,7 @@
             $scope.expCalc = getDataService;
         } else {
             $scope.expCalc =
-                {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,1.1934,0.0174,0.5186],[0.8379,1,0.0146,0.4345],[57.322,68.4158,1,29.7271],[1.928,2.2963,0.0336,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":true},"meta":{"title":"Новый расчет 0","total":74.208,"fullRefund":-15.466800000000003,"negativeFullBalance":-4.89,"positiveFullBalance":4.89},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"1","total":21,"share":10.6416,"balance":10.3584,"receivedSum":10.36,"givenSum":0,"fullBalance":0},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Wed Oct 04 2017 16:56:53 GMT+0300 (Belarus Standard Time)","value":21,"currency":"3","isPaid":true,"partList":[false,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":21.208,"share":31.7832,"balance":-10.575200000000002,"receivedSum":0,"givenSum":10.58,"fullBalance":0},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Wed Oct 04 2017 16:57:00 GMT+0300 (Belarus Standard Time)","value":11,"currency":"0","isPaid":true,"partList":[true,true,true,true]}],"fixation":{"whom":[{"number":"0","value":4.51,"currency":"1","date":"Wed Oct 04 2017 16:58:55 GMT+0300 (Belarus Standard Time)","isFixed":true},{"number":"0","value":0.01,"currency":"3","date":"Wed Oct 04 2017 16:59:00 GMT+0300 (Belarus Standard Time)","isFixed":true},{"number":"2","value":0.22,"currency":"3","date":"Wed Oct 04 2017 16:59:05 GMT+0300 (Belarus Standard Time)","isFixed":true}],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"0","total":21,"share":15.8916,"balance":5.1084,"receivedSum":0.22,"givenSum":0,"fullBalance":4.89},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Wed Oct 04 2017 16:57:11 GMT+0300 (Belarus Standard Time)","value":21,"currency":"3","isPaid":true,"partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":11,"share":15.8916,"balance":-4.8916,"receivedSum":0,"givenSum":0,"fullBalance":-4.89},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Wed Oct 04 2017 16:57:19 GMT+0300 (Belarus Standard Time)","value":11,"currency":"3","isPaid":true,"partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}}]}]}
+                {"settings":{"currentAccount":0,"currencies":{"names":["usd","eur","rub","byn"],"rates":[[1,1.1934,0.0174,0.5186],[0.8379,1,0.0146,0.4345],[57.322,68.4158,1,29.7271],[1.928,2.2963,0.0336,1]]},"baseCurrency":"3","expensesTypes":[{"name":"Общие расходы","icon":""},{"name":"Продукты питания","icon":""},{"name":"Жильё","icon":""},{"name":"Машина","icon":""},{"name":"Развлечение","icon":""}]},"accounts":[{"settings":{"accountCurrency":"3","fixationDirectly":false},"meta":{"title":"Новый расчет 0","total":74.208,"fullRefund":-15.466800000000003,"negativeFullBalance":-15.47,"positiveFullBalance":15.47},"participants":[{"meta":{"title":"Участник 0.0","participation":1,"preferredCurrency":"1","total":21,"share":10.6416,"balance":10.3584,"receivedSum":0,"givenSum":0,"fullBalance":10.36},"expenses":[{"title":"Расход 0.0.0","type":"0","date":"Wed Oct 04 2017 16:56:53 GMT+0300 (Belarus Standard Time)","value":21,"currency":"3","isPaid":true,"partList":[false,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.1","participation":2,"preferredCurrency":"3","total":21.208,"share":31.7832,"balance":-10.575200000000002,"receivedSum":0,"givenSum":0,"fullBalance":-10.58},"expenses":[{"title":"Расход 0.1.0","type":"0","date":"Wed Oct 04 2017 16:57:00 GMT+0300 (Belarus Standard Time)","value":11,"currency":"0","isPaid":true,"partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.2","participation":1,"preferredCurrency":"0","total":21,"share":15.8916,"balance":5.1084,"receivedSum":0,"givenSum":0,"fullBalance":5.11},"expenses":[{"title":"Расход 0.2.0","type":"0","date":"Wed Oct 04 2017 16:57:11 GMT+0300 (Belarus Standard Time)","value":21,"currency":"3","isPaid":true,"partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}},{"meta":{"title":"Участник 0.3","participation":1,"preferredCurrency":"3","total":11,"share":15.8916,"balance":-4.8916,"receivedSum":0,"givenSum":0,"fullBalance":-4.89},"expenses":[{"title":"Расход 0.3.0","type":"0","date":"Wed Oct 04 2017 16:57:19 GMT+0300 (Belarus Standard Time)","value":11,"currency":"3","isPaid":true,"partList":[true,true,true,true]}],"fixation":{"whom":[],"byBank":[]}}]}]}
         }
         if (!$scope.expCalc.accounts.length) $scope.createAccount();
     }];

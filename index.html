@@ -13,7 +13,7 @@
 </head>
 <body ng-app="app" ng-controller="calculatorCtrl">
 
-<input type="checkbox" class="big-checkbox float-left" data-object-toggle style="margin: 15px;" />
+<input type="checkbox" class="big-checkbox float-left" checked="checked" data-object-toggle style="margin: 15px;" />
 
 <div class="wrap">
 <header>
@@ -139,7 +139,7 @@
 								<li class="padding5-0 bg" ng-repeat="expense in participant.expenses track by $index"
 									ng-init="expenseIndex = $index">
 									<div class="flex">
-										<div>
+										<div ng-if="!expense.isPaid">
 											<button class="btn btn-danger" ng-click="removeExpense(participantIndex, expenseIndex)">
 												<i class="fa fa-minus"></i>
 											</button>
@@ -273,8 +273,9 @@
 												<input type="checkbox" class="big-checkbox"
 													   ng-model="expense.partList[extParticipantIndex]"
 													   ng-change="checkPartList(expense.partList, extParticipantIndex)">
-												{{expense.title}} ({{intParticipant.meta.title}})
 											</label>
+
+											{{expense.title}} ({{intParticipant.meta.title}})
 
 											<span class="float-right text-uppercase">
 												<b>{{roundOff(getExpenseShare(expense, extParticipantIndex))}}</b>
@@ -292,15 +293,6 @@
 				<li class="step3">
 					<!--=========== STEP 3 ============-->
 					<h5 class="margin5-0">Шаг 3: Фиксация возвратов</h5>
-					<h5 class="margin5-0 flex">
-						<span class="flex-grow1">Баланс возвратов:</span>
-						<span class="text-uppercase">
-							<b>
-								{{getReturnsBalance()}}
-								{{getAccountCurrency()}}
-							</b>
-						</span>
-					</h5>
 
 					<div class="padding10-0">
 						<label>
@@ -312,6 +304,17 @@
 					<div class="fixation-directly"
 						 ng-class="(account.meta.negativeFullBalance && account.meta.positiveFullBalance) ? '' : 'completed'"
 						 ng-if="account.settings.fixationDirectly">
+
+						<h5 class="margin5-0 flex">
+							<span class="flex-grow1">Баланс возвратов:</span>
+							<span class="text-uppercase">
+								<b>
+									{{getReturnsBalance()}}
+									{{getAccountCurrency()}}
+								</b>
+							</span>
+						</h5>
+						<h5 class="text-center">Расчет напрямую</h5>
 
 						<ul class="participants">
 							<li class="padding5-0" ng-repeat="participant in account.participants track by $index"
@@ -349,7 +352,7 @@
 										ng-init="refundIndex = $index">
 
 										<div class="flex">
-											<div>
+											<div ng-if="!refund.isFixed">
 												<button class="btn btn-danger" ng-click="removePayment(participant, refundIndex)">
 													<i class="fa fa-minus"></i>
 												</button>
@@ -409,7 +412,95 @@
 
 
 					<div class="fixation-by-bank" ng-if="!account.settings.fixationDirectly">
-						<!-- Fixation by bank -->
+						<h5 class="margin5-0 flex">
+							<span class="flex-grow1">Баланс возвратов:</span>
+							<span class="text-uppercase">
+								<b>
+									getReturnsBalance('byBank')
+									{{getAccountCurrency()}}
+								</b>
+							</span>
+						</h5>
+
+						<h5 class="text-center">Расчет через общий банк</h5>
+
+						<div class="padding10-0 font-weight-bold text-uppercase" style="background: white">
+							<span>Банк:</span>
+							<span class="float-right">{{getAccountBank()}} {{getAccountCurrency()}}</span>
+						</div>
+
+						<ul class="participants">
+							<li class="padding5-0" ng-repeat="participant in account.participants track by $index"
+								ng-class="{'debtor': participant.meta.fullBalanceByBank < 0, 'sponsor': participant.meta.fullBalanceByBank > 0}"
+								ng-init="participantIndex = $index">
+
+								<div class="padding5-0 bg">
+									<h5 class="nowrap">{{participant.meta.title}}</h5>
+
+									<h5 class="margin5-0 clearfix">
+										<span ng-if="participant.meta.fullBalanceByBank != 0">{{participant.meta.fullBalanceByBank >= 0 ? 'Получит' : 'Вернет:'}}</span>
+
+										<span class="text-uppercase float-right">
+											<b>{{getParticipantFullBalanceByBank(participant)}} {{getAccountCurrency()}}</b>
+										</span>
+									</h5>
+								</div>
+
+								<ul class="part-list history">
+									<li class="padding5-0 bg" ng-repeat="byBankObject in participant.fixation.byBank track by $index"
+										ng-init="byBankObjectIndex = $index">
+										<div class="flex">
+											<div>
+												<button class="btn btn-danger" ng-click="removePaymentByBank(participant, byBankObjectIndex)"
+														ng-if="!byBankObject.isFixed">
+													<i class="fa fa-minus"></i>
+												</button>
+											</div>
+											<div>
+												<span ng-if="byBankObject.token > 0">Получил</span>
+												<span ng-if="byBankObject.token < 0">Вернул</span>
+											</div>
+											<div class="text-uppercase">
+												<b>{{getAccountCurrency()}}</b>
+											</div>
+											<div class="flex-grow1">
+												<input type="text" class="form-control" placeholder="сумма"
+													   ng-model="byBankObject.value"
+													   ng-disabled="byBankObject.isFixed">
+											</div>
+											<div>
+												<input class="big-checkbox" type="checkbox"
+													   ng-model="byBankObject.isFixed"
+													   ng-change="" />
+											</div>
+										</div>
+
+										<div class="text-right">{{formatDate(byBankObject.date)}}</div>
+									</li>
+
+									<li class="padding5-0 bg">
+										<button class="btn btn-primary" ng-click="addNewPaymentByBank(participant, 1)">
+											<i class="fa fa-exchange"></i>
+											Получить
+										</button>
+
+										<button class="btn btn-primary" ng-click="addNewPaymentByBank(participant, -1)">
+											<i class="fa fa-exchange"></i>
+											Отдать
+										</button>
+									</li>
+								</ul>
+
+								<div class="padding10-0 text-uppercase bg font-weight-bold">
+									<span>В резерве:</span>
+
+									<span class="float-right">
+										0 {{getAccountCurrency()}}
+									</span>
+								</div>
+
+							</li>
+						</ul>
 					</div>
 				</li>
 			</ul>
