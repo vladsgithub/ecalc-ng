@@ -302,7 +302,7 @@
 					</div>
 
 					<div class="fixation-directly"
-						 ng-class="(account.meta.negativeFullBalance && account.meta.positiveFullBalance) ? '' : 'completed'"
+						 ng-class="(account.meta.negBalance && account.meta.posBalance) ? '' : 'completed'"
 						 ng-if="account.settings.fixationDirectly">
 
 						<h5 class="margin5-0 flex">
@@ -382,7 +382,7 @@
 												</select>
 											</div>
 											<div class="flex-grow1">
-												<input type="text" class="form-control" placeholder="сумма"
+												<input type="number" class="form-control" placeholder="сумма"
 													   ng-model="refund.value"
 													   ng-disabled="refund.isFixed">
 											</div>
@@ -411,12 +411,14 @@
 					</div>
 
 
-					<div class="fixation-by-bank" ng-if="!account.settings.fixationDirectly">
+					<div class="fixation-by-bank"
+						 ng-class="(account.meta.negBalanceByBank && account.meta.posBalanceByBank) ? '' : 'completed'"
+						 ng-if="!account.settings.fixationDirectly">
 						<h5 class="margin5-0 flex">
 							<span class="flex-grow1">Баланс возвратов:</span>
 							<span class="text-uppercase">
 								<b>
-									getReturnsBalance('byBank')
+									{{getReturnsBalance('byBank')}}
 									{{getAccountCurrency()}}
 								</b>
 							</span>
@@ -464,14 +466,14 @@
 												<b>{{getAccountCurrency()}}</b>
 											</div>
 											<div class="flex-grow1">
-												<input type="text" class="form-control" placeholder="сумма"
+												<input type="number" class="form-control" placeholder="сумма"
 													   ng-model="byBankObject.value"
 													   ng-disabled="byBankObject.isFixed">
 											</div>
 											<div>
 												<input class="big-checkbox" type="checkbox"
 													   ng-model="byBankObject.isFixed"
-													   ng-change="" />
+													   ng-change="checkPaymentByBank(byBankObject)" />
 											</div>
 										</div>
 
@@ -490,14 +492,6 @@
 										</button>
 									</li>
 								</ul>
-
-								<div class="padding10-0 text-uppercase bg font-weight-bold">
-									<span>В резерве:</span>
-
-									<span class="float-right">
-										0 {{getAccountCurrency()}}
-									</span>
-								</div>
 
 							</li>
 						</ul>
