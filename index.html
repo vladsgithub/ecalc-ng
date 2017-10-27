@@ -13,7 +13,7 @@
 </head>
 <body ng-app="app" ng-controller="calculatorCtrl">
 
-<input type="checkbox" class="big-checkbox float-left" checked="checked" data-object-toggle style="margin: 15px;" />
+<input type="checkbox" class="big-checkbox float-left" data-object-toggle style="margin: 15px;" />
 
 <div class="wrap">
 <header>
@@ -92,6 +92,13 @@
 					</label>
 					<button class="btn btn-danger btn-sm" ng-click="removeCurrentAccount()">Удалить расчет</button>
 
+					<label style="margin-left: 50px;">
+						<input type="checkbox" ng-model="expCalc.settings.isPrintView"/>
+						На печать
+					</label>
+
+					<span style="margin-left: 50px;">Сегодня: {{today()}}</span>
+
 					<label class="float-right">
 						<div>Основная валюта в расчетах: </div>
 						<select class="form-control currency-select float-right" ng-model="account.settings.accountCurrency"
@@ -101,7 +108,7 @@
 				</h5>
 			</header>
 
-			<ul class="layout">
+			<ul class="layout" ng-if="!expCalc.settings.isPrintView">
 				<li class="step1">
 					<!--=========== STEP 1 ============-->
 					<h5 class="margin5-0">Шаг 1: Список участников и расходов</h5>
@@ -302,7 +309,7 @@
 					</div>
 
 					<div class="fixation-directly"
-						 ng-class="(account.meta.negBalance && account.meta.posBalance) ? '' : 'completed'"
+						 ng-class="(account.meta.negBalance == 0 && account.meta.posBalance == 0) ? 'completed' : ''"
 						 ng-if="account.settings.fixationDirectly">
 
 						<h5 class="margin5-0 flex">
@@ -412,7 +419,7 @@
 
 
 					<div class="fixation-by-bank"
-						 ng-class="(account.meta.negBalanceByBank && account.meta.posBalanceByBank) ? '' : 'completed'"
+						 ng-class="(account.meta.negBalanceByBank == 0 && account.meta.posBalanceByBank == 0) ? 'completed' : ''"
 						 ng-if="!account.settings.fixationDirectly">
 						<h5 class="margin5-0 flex">
 							<span class="flex-grow1">Баланс возвратов:</span>
@@ -501,6 +508,16 @@
 		</li>
 	</ul>
 
+
+	<div class="print-view">
+		<table>
+			<tbody>
+			<tr class="">
+				<td>some value</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
 </main>
 
 
@@ -508,7 +525,7 @@
 
 
 
-	<div style="padding: 30px 15px 10px;">
+	<div style="padding: 30px 15px 10px;" ng-if="!expCalc.settings.isPrintView">
 		<button class="btn-lg margin5-0" ng-click="copyObjectToBuffer()">Скопировать объект данных в буфер</button>
 		<div id="angularObject">{{expCalc}}</div>
 	</div>

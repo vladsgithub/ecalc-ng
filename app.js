@@ -265,7 +265,9 @@
                 currentAccount.meta.total += participant.meta.total;
             });
 
-            return currentAccount.meta.total;
+            currentAccount.meta.total = $scope.exact(currentAccount.meta.total);
+
+            return $scope.exact(currentAccount.meta.total);
         };
 
         $scope.getParticipantTotal = function (participant) {
@@ -284,7 +286,7 @@
         $scope.getMoneyByAccountCurrency = function (value, exchangeCurrency) {
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount],
                 rate = $scope.expCalc.settings.currencies.rates[currentAccount.settings.accountCurrency][exchangeCurrency];
-// console.log('getMoneyByAccountCurrency -> value * rate =', value * rate);
+
             return value * rate;
         };
 
@@ -331,7 +333,7 @@
                 });
             });
 
-            currentAccount.participants[extParticipantIndex].meta.share = participantShare;
+            currentAccount.participants[extParticipantIndex].meta.share = $scope.exact(participantShare);
 
             return participantShare;
         };
@@ -356,13 +358,13 @@
                 fullRefund += (balance < 0) ? balance : 0;
             });
 
-            currentAccount.meta.fullRefund = fullRefund;
+            currentAccount.meta.fullRefund = $scope.exact(fullRefund);
 
             return fullRefund;
         };
 
         $scope.getBalance = function (participant) {
-            participant.meta.balance = participant.meta.total - participant.meta.share;
+            participant.meta.balance = $scope.exact(participant.meta.total - participant.meta.share);
 
             return participant.meta.balance;
         };
@@ -386,17 +388,15 @@
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
 
             participant.meta.receivedSum = 0;
-// console.log('-----------', participant.meta.title);
+
             currentAccount.participants.forEach(function(person, i, arr) {
                 person.fixation.whom.forEach(function(refund, n, arr) {
                     if (refund.isFixed && participantIndex == refund.number && refund.number !== null && refund.currency !== null) {
-// console.log(participant.meta.receivedSum , ' += ', $scope.getMoneyByAccountCurrency(refund.value, refund.currency));
                         participant.meta.receivedSum += $scope.roundOff($scope.getMoneyByAccountCurrency(refund.value, refund.currency), true);
-// console.log('++++++++++++++++receivedSum = ', participant.meta.receivedSum);
                     }
                 });
             });
-// console.log('participant.meta.receivedSum = ', participant.meta.receivedSum);
+
             participant.meta.receivedSum = $scope.roundOff(participant.meta.receivedSum);
 
             return participant.meta.receivedSum;
@@ -404,17 +404,15 @@
 
         $scope.getGivenSum = function (participant) {
             participant.meta.givenSum = 0;
-// console.log('-----------', participant.meta.title);
+
             participant.fixation.whom.forEach(function(refund, i, arr) {
                 if (refund.isFixed && refund.number !== null && refund.currency !== null) {
-// console.log('*** refund.value, refund.currency = ', refund.value, refund.currency);
                     participant.meta.givenSum += $scope.roundOff($scope.getMoneyByAccountCurrency(refund.value, refund.currency), true);
-// console.log('*** participant.meta.givenSum = ', participant.meta.givenSum);
                 }
             });
 
             participant.meta.givenSum = $scope.roundOff(participant.meta.givenSum);
-// console.log('--> participant.meta.givenSum = ', participant.meta.givenSum);
+
             return participant.meta.givenSum;
         };
 
@@ -446,8 +444,6 @@
                 result = $scope.roundOff(calculation),
                 resultByPrefferedCurrency = $scope.getMoneyByPrefferedCurrency(calculation, participant.meta.preferredCurrency);
 
-// console.log('-----------', participant.meta.title);
-// console.log('participantBalance, participantReceivedSum, participantGivenSum ===> ', participantBalance, participantReceivedSum, participantGivenSum);
             participant.meta.fullBalance = result;
 
             return (byPrefferedCurrency) ? $scope.roundOff(resultByPrefferedCurrency, true) : result;
@@ -519,6 +515,10 @@
 
 
         // OTHER METHODS ===============================
+        $scope.exact = function (value) {
+            return Math.round(value * 1000000000) / 1000000000; // in order to cut off a very long fractional part
+        };
+
         $scope.roundOff = function (value, isDown) {
             if (value === undefined) return 0;
             if (value > 9999999999) {
@@ -526,13 +526,12 @@
                 return 0;
             }
 
-// console.log('value = ', value);
-            value = Math.round(value * 1000000000 * 100) / 1000000000; // in order to cut off a very long fractional part
-// console.log('value after cut off = ', value);
+            value = $scope.exact(value);
+
             if (isDown) {
-                return Math.floor(value) / 100;
+                return Math.floor(value * 100) / 100;
             } else {
-                return Math.round(value) / 100;
+                return Math.round(value * 100) / 100;
             }
         };
 
@@ -682,6 +681,8 @@
         $scope.checkPaymentByBank = function (byBankObject) {
             var currentAccount = $scope.expCalc.accounts[$scope.expCalc.settings.currentAccount];
 
+            if (!byBankObject.isFixed) return;
+
             if (byBankObject.value <= 0) {
                 byBankObject.isFixed = false;
 
@@ -695,6 +696,10 @@
 
                 byBankObject.value = currentAccount.meta.bank;
             }
+        };
+
+        $scope.today = function () {
+            return $scope.formatDate('' + new Date());
         };
 
 
@@ -756,7 +761,7 @@
 
         console.log($scope);
 
-        if (false) {
+        if (true) {
             $scope.expCalc = getDataService;
         } else {
             $scope.expCalc =
