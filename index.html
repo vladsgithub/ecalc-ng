@@ -16,7 +16,7 @@
 <input type="checkbox" class="big-checkbox float-left" data-object-toggle style="margin: 15px;" />
 
 <div class="wrap">
-<header>
+<header ng-if="!expCalc.settings.isPrintView">
 	<span ng-repeat="account in expCalc.accounts track by $index">
 		<button class="btn btn-primary"
 				ng-class="{'active': expCalc.settings.currentAccount==$index}"
@@ -92,12 +92,12 @@
 					</label>
 					<button class="btn btn-danger btn-sm" ng-click="removeCurrentAccount()">Удалить расчет</button>
 
-					<label style="margin-left: 50px;">
+					<label style="margin-left: 30px;">
 						<input type="checkbox" ng-model="expCalc.settings.isPrintView"/>
 						На печать
 					</label>
 
-					<span style="margin-left: 50px;">Сегодня: {{today()}}</span>
+					<span style="margin-left: 30px;">Сегодня: {{today()}}</span>
 
 					<label class="float-right">
 						<div>Основная валюта в расчетах: </div>
@@ -509,14 +509,107 @@
 	</ul>
 
 
-	<div class="print-view">
-		<table>
+	<div class="print-view"
+		 ng-if="expCalc.settings.isPrintView && expCalc.settings.currentAccount == $index"
+		 ng-repeat="account in expCalc.accounts track by $index">
+
+		<table class="currencies" ng-init="currencies = expCalc.settings.currencies">
+			<thead>
+			<tr>
+				<th> </th>
+				<th colspan="100">Курс, по которому покупается указанная валюта</th>
+			</tr>
+			<tr>
+				<th>Основная валюта</th>
+				<th ng-repeat="name in currencies.names track by $index">
+					{{currencies.names[$index]}}
+				</th>
+			</tr>
+			</thead>
+
 			<tbody>
-			<tr class="">
-				<td>some value</td>
+			<tr ng-repeat="name in expCalc.settings.currencies.names track by $index" ng-init="nameIndex = $index">
+				<td>
+					{{expCalc.settings.currencies.names[$index]}}
+				</td>
+				<td ng-repeat="array in currencies.rates[nameIndex] track by $index">
+					{{currencies.rates[nameIndex][$index]}}
+				</td>
 			</tr>
 			</tbody>
 		</table>
+
+		<table class="expenses-table">
+			<thead>
+			<tr>
+				<th>Расходы</th>
+				<th>Тип</th>
+				<th>Дата</th>
+				<th>Сумма</th>
+
+				<th ng-repeat="participant in account.participants track by $index">
+					Доля:<br/>{{participant.meta.title}}<br/>(Участие {{participant.meta.participation * 100}}%)
+				</th>
+			</tr>
+			</thead>
+
+			<tbody ng-repeat="participant in account.participants track by $index"
+				   ng-init="extParticipantIndex = $index">
+			<tr>
+				<td colspan="3" class="font-weight-bold">{{participant.meta.title}}</td>
+				<td>Все расходы:
+					<span class="nowrap font-weight-bold">{{roundOff(participant.meta.total)}} {{getAccountCurrency()}}</span>
+				</td>
+
+				<td ng-repeat="extParticipant in account.participants track by $index"> </td>
+			</tr>
+
+			<tr ng-repeat="expense in participant.expenses track by $index">
+				<td>{{expense.title}}</td>
+				<td><span class="small">{{expCalc.settings.expensesTypes[expense.type].name}}</span></td>
+				<td><span class="small">{{formatDate(expense.date)}}</span></td>
+				<td><span class="nowrap">{{expense.value}} {{expCalc.settings.currencies.names[expense.currency].toUpperCase()}}</span></td>
+
+				<td ng-repeat="extParticipant in account.participants track by $index"
+					ng-init="extParticipantIndex = $index">
+					<span class="nowrap">
+						{{roundOff(getExpenseShare(expense, extParticipantIndex))}}
+						<span ng-if="roundOff(getExpenseShare(expense, extParticipantIndex)) != 0">{{getAccountCurrency()}}</span>
+					</span>
+				</td>
+			</tr>
+
+			</tbody>
+
+			<tbody>
+			<tr>
+				<td colspan="4"></td>
+
+				<td ng-repeat="participant in account.participants track by $index"
+					ng-init="participantIndex = $index">
+					Всего:
+					<span class="nowrap font-weight-bold">{{roundOff(getParticipantShare(participantIndex))}} {{getAccountCurrency()}}</span>
+				</td>
+			</tr>
+			</tbody>
+
+			<tbody>
+			<tr>
+				<td colspan="4"><span class="font-weight-bold">Расходы по типам:</span></td>
+				<td colspan="100"></td>
+			</tr>
+			<tr ng-repeat="expensesType in expCalc.settings.expensesTypes track by $index"
+				ng-init="typeIndex = $index">
+				<td colspan="4">{{expensesType.name}}</td>
+
+				<td ng-repeat="participant in account.participants track by $index">
+					<span class="nowrap">{{participant.meta.expensesByTypes[typeIndex]}} {{getAccountCurrency()}}</span>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+
+
 	</div>
 </main>
 

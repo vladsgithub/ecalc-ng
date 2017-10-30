@@ -283,3 +283,48 @@ hr {
 .completed .bg {
 	background: #7ee56f;
 }
+.nowrap {
+	line-height: inherit;
+}
+
+
+@media print {
+	html { font-size: 10px; }
+}
+.print-view {
+	padding: 20px 20px 0;
+}
+.print-view table {
+	margin-bottom: 20px;
+}
+.print-view th,
+.print-view td {
+	padding: 5px;
+	border: 1px solid darkgray;
+	text-align: center;
+}
+.print-view th {
+	background: lightgray;
+}
+.print-view tr:nth-child(even) td {
+	background: #ebebeb;
+}
+
+.print-view .currencies tr:first-child th {
+	font-size: 1rem;
+}
+.print-view .currencies tr:nth-child(2) th {
+	text-transform: uppercase;
+	font-weight: normal;
+}
+.print-view .currencies tr:nth-child(2) th:first-child {
+	text-transform: none;
+	font-weight: bold;
+}
+.print-view .currencies td:first-child {
+	text-transform: uppercase;
+	font-weight: bold;
+}
+.print-view .expenses-table tr:last-child td {
+	border-bottom: 20px solid lightgray;
+}
