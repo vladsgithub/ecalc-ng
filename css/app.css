@@ -300,8 +300,11 @@ hr {
 .print-view th,
 .print-view td {
 	padding: 5px;
-	border: 1px solid darkgray;
+	border: 1px solid lightgray;
 	text-align: center;
+}
+.print-view .border-right {
+	border-right: 10px solid lightgray;
 }
 .print-view th {
 	background: lightgray;

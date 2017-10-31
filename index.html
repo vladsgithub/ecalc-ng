@@ -542,22 +542,29 @@
 		<table class="expenses-table">
 			<thead>
 			<tr>
-				<th>Расходы</th>
-				<th>Тип</th>
-				<th>Дата</th>
-				<th>Сумма</th>
+				<th colspan="4" class="border-right"></th>
 
 				<th ng-repeat="participant in account.participants track by $index">
-					Доля:<br/>{{participant.meta.title}}<br/>(Участие {{participant.meta.participation * 100}}%)
+					{{participant.meta.title}}<br/>(Участие {{participant.meta.participation * 100}}%)
 				</th>
 			</tr>
 			</thead>
+
+			<tbody>
+			<tr>
+				<td class="font-weight-bold">Расходы</td>
+				<td class="font-weight-bold">Тип</td>
+				<td class="font-weight-bold">Дата</td>
+				<td class="font-weight-bold border-right">Сумма</td>
+				<td colspan="100" class="font-weight-bold">Доля участника в каждом расходе</td>
+			</tr>
+			</tbody>
 
 			<tbody ng-repeat="participant in account.participants track by $index"
 				   ng-init="extParticipantIndex = $index">
 			<tr>
 				<td colspan="3" class="font-weight-bold">{{participant.meta.title}}</td>
-				<td>Все расходы:
+				<td class="border-right">Все расходы:
 					<span class="nowrap font-weight-bold">{{roundOff(participant.meta.total)}} {{getAccountCurrency()}}</span>
 				</td>
 
@@ -568,7 +575,7 @@
 				<td>{{expense.title}}</td>
 				<td><span class="small">{{expCalc.settings.expensesTypes[expense.type].name}}</span></td>
 				<td><span class="small">{{formatDate(expense.date)}}</span></td>
-				<td><span class="nowrap">{{expense.value}} {{expCalc.settings.currencies.names[expense.currency].toUpperCase()}}</span></td>
+				<td class="border-right"><span class="nowrap">{{expense.value}} {{expCalc.settings.currencies.names[expense.currency].toUpperCase()}}</span></td>
 
 				<td ng-repeat="extParticipant in account.participants track by $index"
 					ng-init="extParticipantIndex = $index">
@@ -583,7 +590,8 @@
 
 			<tbody>
 			<tr>
-				<td colspan="4"></td>
+				<td colspan="3"></td>
+				<td class="font-weight-bold border-right">Всех расходов: <span class="nowrap">{{roundOff(getAccountTotal())}} {{getAccountCurrency()}}</span></td>
 
 				<td ng-repeat="participant in account.participants track by $index"
 					ng-init="participantIndex = $index">
@@ -593,17 +601,102 @@
 			</tr>
 			</tbody>
 
+			<thead><tr><th colspan="100"><hr/></th><tr></thead>
+
 			<tbody>
 			<tr>
-				<td colspan="4"><span class="font-weight-bold">Расходы по типам:</span></td>
+				<td colspan="4" class="font-weight-bold text-right border-right">Расходы по типам:</td>
 				<td colspan="100"></td>
 			</tr>
 			<tr ng-repeat="expensesType in expCalc.settings.expensesTypes track by $index"
 				ng-init="typeIndex = $index">
-				<td colspan="4">{{expensesType.name}}</td>
+				<td colspan="4" class="text-right border-right">{{expensesType.name}}</td>
 
 				<td ng-repeat="participant in account.participants track by $index">
 					<span class="nowrap">{{participant.meta.expensesByTypes[typeIndex]}} {{getAccountCurrency()}}</span>
+				</td>
+			</tr>
+			</tbody>
+
+			<thead><tr><th colspan="100"><hr/></th><tr></thead>
+
+			<tbody>
+			<tr>
+				<td colspan="4" class="font-weight-bold text-right border-right">
+					Взносы
+					<span ng-if="account.settings.fixationDirectly">от участника -> участнику</span>
+					<span ng-if="!account.settings.fixationDirectly">через общий банк</span>
+					:
+				</td>
+				<td colspan="100">
+					<span class="font-weight-bold" ng-if="!account.settings.fixationDirectly">
+						В общем банке: {{account.meta.bank}} {{getAccountCurrency()}}
+					</span>
+				</td>
+			</tr>
+			</tbody>
+
+			<tbody ng-repeat="participant in account.participants track by $index"
+				   ng-if="account.settings.fixationDirectly">
+			<tr ng-repeat="whom in participant.fixation.whom track by $index">
+				<td colspan="2"></td>
+				<td><span class="small">{{formatDate(whom.date)}}</span></td>
+				<td class="border-right">{{participant.meta.title}} -></td>
+
+				<td ng-repeat="participant in account.participants track by $index">
+					<span class="nowrap" ng-if="whom.number == $index">
+						{{whom.value}} {{expCalc.settings.currencies.names[whom.currency].toUpperCase()}}
+					</span>
+				</td>
+			</tr>
+			</tbody>
+
+			<tbody ng-repeat="participant in account.participants track by $index"
+				   ng-init="participantIndex = $index"
+				   ng-if="!account.settings.fixationDirectly">
+			<tr ng-repeat="byBank in participant.fixation.byBank track by $index">
+				<td colspan="2"></td>
+				<td><span class="small">{{formatDate(byBank.date)}}</span></td>
+				<td class="border-right">
+					<span ng-if="byBank.token > 0">Получил</span>
+					<span ng-if="byBank.token < 0">Вернул</span>
+				</td>
+
+				<td ng-repeat="participant in account.participants track by $index">
+					<span class="nowrap" ng-if="participantIndex == $index">
+						<span ng-if="byBank.token > 0">+</span>
+						<span ng-if="byBank.token < 0">-</span>
+						{{byBank.value}} {{getAccountCurrency()}}
+					</span>
+				</td>
+			</tr>
+			</tbody>
+
+			<tbody>
+			<tr>
+				<td colspan="4" class="border-right"></td>
+				<td colspan="100" class="font-weight-bold"><hr/>Окончательный расчет<hr/></td>
+			</tr>
+			<tr ng-if="account.settings.fixationDirectly">
+				<td colspan="4" class="border-right"></td>
+
+				<td class="font-weight-bold" ng-repeat="participant in account.participants track by $index">
+					<div ng-if="participant.meta.fullBalance > 0">Получить</div>
+					<div ng-if="participant.meta.fullBalance < 0">Вернуть</div>
+					<span class="nowrap" style="font-size: 1.5rem">
+						<span ng-if="participant.meta.fullBalance > 0">+</span>{{participant.meta.fullBalance}} {{getAccountCurrency()}}
+					</span>
+				</td>
+			</tr>
+			<tr ng-if="!account.settings.fixationDirectly">
+				<td colspan="4" class="border-right"></td>
+
+				<td class="font-weight-bold" ng-repeat="participant in account.participants track by $index">
+					<div ng-if="participant.meta.fullBalanceByBank > 0">Получить</div>
+					<div ng-if="participant.meta.fullBalanceByBank < 0">Вернуть</div>
+					<span class="nowrap" style="font-size: 1.5rem">
+						<span ng-if="participant.meta.fullBalanceByBank > 0">+</span>{{participant.meta.fullBalanceByBank}} {{getAccountCurrency()}}
+					</span>
 				</td>
 			</tr>
 			</tbody>
