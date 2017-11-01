@@ -16,7 +16,7 @@
 <input type="checkbox" class="big-checkbox float-left" data-object-toggle style="margin: 15px;" />
 
 <div class="wrap">
-<header ng-if="!expCalc.settings.isPrintView">
+<header class="clearfix" ng-if="!expCalc.settings.isPrintView">
 	<span ng-repeat="account in expCalc.accounts track by $index">
 		<button class="btn btn-primary"
 				ng-class="{'active': expCalc.settings.currentAccount==$index}"
@@ -29,9 +29,9 @@
 	</button>
 
 	<div class="float-right" style="position: relative;">
-		<label class="btn btn-info" for="currenciesBox">Currencies</label>
+		<label class="btn btn-info" for="currenciesBox">Валюта</label>
 		<input id="currenciesBox" type="checkbox" style="visibility: hidden;" />
-		<div class="currencies-box">
+		<div class="toggle-box currencies-box">
 
 			<table ng-init="currencies = expCalc.settings.currencies">
 				<thead>
@@ -77,6 +77,31 @@
 
 		</div>
 	</div>
+
+	<div class="float-right" style="position: relative;">
+		<label class="btn btn-info" for="expensesTypeBox">Типы расходов</label>
+		<input id="expensesTypeBox" type="checkbox" style="visibility: hidden;" />
+		<div class="toggle-box">
+
+			<ul>
+				<li class="nowrap padding5-0" ng-repeat="expensesType in expCalc.settings.expensesTypes track by $index">
+					<button class="btn btn-danger" ng-click="removeExpensesType($index)">
+						<i class="fa fa-minus"></i>
+					</button>
+					{{$index + 1}}
+					<input type="text" class="form-control inline-block" ng-model="expensesType.name" />
+				</li>
+
+				<li class="nowrap padding5-0">
+					<button class="btn btn-primary" ng-click="addNewExpensesType()">
+						<i class="fa fa-plus"></i>
+					</button>
+					Новый тип расходов
+				</li>
+			</ul>
+
+		</div>
+	</div>
 </header>
 
 <main>
@@ -84,7 +109,7 @@
 		<li ng-repeat="account in expCalc.accounts track by $index"
 			ng-if="expCalc.settings.currentAccount == $index">
 
-			<header>
+			<header class="clearfix">
 				<h5>
 					<label>
 						<div>Название расчёта:</div>

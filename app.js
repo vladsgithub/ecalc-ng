@@ -70,6 +70,26 @@
 
 
         // METHODS OF REMOVING ===============================
+        $scope.removeExpensesType = function (typeIndex) {
+            var error = $scope.isExpensesTypeUsed(typeIndex);
+
+            if (error) {
+                alert(error);
+            } else {
+                $scope.expCalc.accounts.forEach(function(account, accountIndex, accountArr) {
+                    account.participants.forEach(function(participant, participantIndex, participantArr) {
+                        participant.expenses.forEach(function(expense, expenseIndex, expenseArr) {
+                            if (expense.type > typeIndex) {
+                                expense.type = (expense.type - 1).toString();
+                            }
+                        });
+                    });
+                });
+
+                $scope.expCalc.settings.expensesTypes.splice(typeIndex, 1);
+            }
+        };
+
         $scope.removeCurrency = function (currencyIndex) {
             var error = $scope.isCurrencyUsed(currencyIndex);
 
@@ -160,6 +180,13 @@
 
 
         // METHODS OF ADDING ===============================
+        $scope.addNewExpensesType = function () {
+            $scope.expCalc.settings.expensesTypes.push({
+                name: '',
+                icon: ''
+            });
+        };
+
         $scope.addNewCurrency = function () {
             var newRateArr = [];
 
@@ -596,6 +623,42 @@
             }
         };
 
+        $scope.isExpensesTypeUsed = function (typeIndex) {
+            var message, errorAccountTitle, errorParticipantTitle, expensesTypeError;
+            var result = '',
+                errors = [],
+                tempArr = [],
+                removableType = $scope.expCalc.settings.expensesTypes[typeIndex].name;
+
+            $scope.expCalc.accounts.forEach(function(account, accountIndex, accountArr) {
+                errorAccountTitle = '\n[ ' + account.meta.title + '; ';
+
+                account.participants.forEach(function(participant, participantIndex, participantArr) {
+                    errorParticipantTitle = participant.meta.title + ' ]\n';
+                    tempArr = [];
+                    expensesTypeError = '- Тип "' + removableType + '" используется в расходах:\n';
+
+
+                    participant.expenses.forEach(function(expense, expenseIndex, expenseArr) {
+                        if (expense.type == typeIndex) tempArr.push(expense.title);
+                    });
+
+                    if (tempArr.length) {
+                        message = errorAccountTitle + errorParticipantTitle + expensesTypeError + tempArr.join('; ');
+
+                        errors.push(message);
+                    }
+                });
+
+            });
+
+            if (errors.length) {
+                result = 'Тип "' + removableType + '" не может быть удален по следующим причинам:\n' + errors.join('\n');
+            }
+
+            return result;
+        };
+
         $scope.isCurrencyUsed = function (currencyIndex) {
             var message, errorAccountTitle, errorParticipantTitle, preferredCurrencyError, whomCurrencyError, expensesError;
             var result = '',
@@ -639,7 +702,7 @@
                     }
                     participant.fixation.whom.forEach(function(whom, whomIndex, whomArr) {
                         if (whom.currency == currencyIndex) {
-                            whomCurrencyError = '- Вернул долг в валюте ' + removeCurrency + '\n';
+                            whomCurrencyError = '- Вернул долг напрямую в валюте ' + removeCurrency + '\n';
                         }
                     });
                     participant.expenses.forEach(function(expense, expenseIndex, expenseArr) {
@@ -662,7 +725,6 @@
                 result = 'Валюта ' + removeCurrency + ' не может быть удалена по следующим причинам:\n' + result + errors.join('\n');
             }
 
-            alert('ошибка: Необходимо еще проверить массив возвратов через общий банк');
             return result;
         };
 
@@ -671,11 +733,12 @@
                 verifiableParticipant = currentAccount.participants[verifiableParticipantIndex];
             var result = false,
                 givenPaymentError = '',
-                receivedPaymentError = '';
+                receivedPaymentError = '',
+                calculationByBank = '';
 
             currentAccount.participants.forEach(function(participant, participantIndex, participantArr) {
                 if (participantIndex == verifiableParticipantIndex && participant.fixation.whom.length) {
-                    givenPaymentError = '- ' + participant.meta.title + ' сделал взносы;';
+                    givenPaymentError = '- ' + participant.meta.title + ' сделал взносы (расчет напрямую);\n';
                 }
                 
                 participant.fixation.whom.forEach(function(whom, whomIndex, whomArr) {
@@ -685,11 +748,16 @@
                 });
             });
 
+            currentAccount.participants.forEach(function(participant, participantIndex, participantArr) {
+                if (participantIndex == verifiableParticipantIndex && participant.fixation.byBank.length) {
+                    calculationByBank = '- ' + participant.meta.title + ' участвует в расчетах через общий банк;\n';
+                }
+            });
+
             if (givenPaymentError || receivedPaymentError) {
-                result = 'Невозможно удалить участника по следующим причинам:\n' + givenPaymentError + receivedPaymentError;
+                result = 'Невозможно удалить участника по следующим причинам:\n' + givenPaymentError + receivedPaymentError + calculationByBank;
             }
 
-            alert('ошибка: Необходимо еще проверить массив возвратов через общий банк');
             return result;
         };
 

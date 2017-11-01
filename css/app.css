@@ -101,7 +101,7 @@ body {
 header {
 	padding: 10px;
 }
-.currencies-box {
+.toggle-box {
 	display: none;
 	position: absolute;
 	right: 5px;
@@ -109,8 +109,9 @@ header {
 	padding: 20px;
 	background: white;
 	border: 1px solid;
+	box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
-input:checked + .currencies-box {
+input:checked + .toggle-box {
 	display: block;
 }
 .currency-bg {
