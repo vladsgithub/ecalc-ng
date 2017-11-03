@@ -844,7 +844,7 @@
 
         console.log($scope);
 
-        if (false) {
+        if (true) {
             $scope.expCalc = getDataService;
         } else {
             $scope.expCalc =
