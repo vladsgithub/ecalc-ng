@@ -103,6 +103,8 @@ header {
 }
 .toggle-box {
 	display: none;
+	max-height: 90vh;
+	overflow: auto;
 	position: absolute;
 	right: 5px;
 	margin-top: 10px;

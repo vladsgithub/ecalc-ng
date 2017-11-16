@@ -39,7 +39,7 @@
 					<th> </th>
 					<th>Основная валюта</th>
 					<th class="secondary-currencies currency-bg" ng-repeat="name in currencies.names track by $index">
-						{{currencies.names[$index]}}
+						1 {{currencies.names[$index]}} =
 						<!--<input type="text" class="form-control currency-bg" ng-model="currencies.names[$index]" />-->
 					</th>
 				</tr>
@@ -75,6 +75,11 @@
 				</tbody>
 			</table>
 
+
+			<div id="currenciesTable" class="padding10-0">
+				<script type="text/javascript"   src="https://ru.exchange-rates.org/GetCustomContent.aspx?sid=RT000JTFR&amp;type=RatesTable&amp;stk=-0CQ8XBC34F" charset="utf-8"></script>
+				<div>Источник: <a href="https://ru.exchange-rates.org/" rel="nofollow">ru.exchange-rates.org</a></div>
+			</div>
 		</div>
 	</div>
 
