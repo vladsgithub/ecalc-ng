@@ -44,6 +44,7 @@ ol, ul {
 
 
 /*=== App styles ===*/
+#angularObject { word-break: break-word; }
 .testing {
 	display: none;
 	position: fixed;
