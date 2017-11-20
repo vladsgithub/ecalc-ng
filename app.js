@@ -785,6 +785,37 @@
             return $scope.formatDate('' + new Date());
         };
 
+        $scope.updateCurrencies = function () {
+            var tds, value;
+            var table = document.getElementById('currenciesTable').querySelectorAll('table')[0];
+            var rows = table.querySelectorAll('tr');
+            var currentCurrencies = $scope.expCalc.settings.currencies;
+
+            currentCurrencies.names.forEach(function(currencyName, j, arr2) {
+                rows.forEach(function(row, i, arr1) {
+                    tds = row.querySelectorAll('td');
+
+                    if (currencyName.toUpperCase() == 'USD') {
+
+                    } else {
+
+                    }
+
+                    if (tds[0].innerHTML.indexOf(currencyName.toUpperCase()) != -1) {
+                        value = tds[1].innerHTML;
+
+                        console.log(currencyName, value);
+                    }
+
+                    // console.log(tds[1].innerHTML);
+                });
+            });
+
+            console.log('table=', table);
+        };
+
+
+
 
 
 

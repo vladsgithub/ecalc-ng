@@ -9,7 +9,8 @@
 	<link rel="stylesheet" href="css/app.css">
 
     <script src="angular.min.js"></script>
-    <script src="app.min.js"></script>
+    <script src="app.js"></script>
+	<!--<script src="app.min.js"></script>-->
 </head>
 <body ng-app="app" ng-controller="calculatorCtrl">
 
@@ -77,8 +78,11 @@
 
 
 			<div id="currenciesTable" class="padding10-0">
-				<script type="text/javascript"   src="https://ru.exchange-rates.org/GetCustomContent.aspx?sid=RT000JTFR&amp;type=RatesTable&amp;stk=-0CQ8XBC34F" charset="utf-8"></script>
-				<div>Источник: <a href="https://ru.exchange-rates.org/" rel="nofollow">ru.exchange-rates.org</a></div>
+				<div class="text-right" style="margin-top: -30px;">
+					<button class="btn btn-success" type="button" ng-click="updateCurrencies()">Обновить курсы валют</button>
+				</div>
+				<script type="text/javascript" src="https://ru.exchange-rates.org/GetCustomContent.aspx?sid=RT000JTFR&amp;type=RatesTable&amp;stk=-0CQ8XBC34F" charset="utf-8"></script>
+				<div>Источник: <a href="https://ru.exchange-rates.org/" target="_blank" rel="nofollow">ru.exchange-rates.org</a></div>
 			</div>
 		</div>
 	</div>
