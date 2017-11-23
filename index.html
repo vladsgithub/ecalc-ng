@@ -79,10 +79,14 @@
 
 			<div id="currenciesTable" class="padding10-0">
 				<div class="text-right" style="margin-top: -30px;">
+					Процент надбавки: <input type="number" step="0.01"
+											 ng-model="expCalc.settings.currencies.commonSurcharge"
+											 ng-change="addSurcharge()"/>
 					<button class="btn btn-success" type="button" ng-click="updateCurrencies()">Обновить курсы валют</button>
 				</div>
-				<script type="text/javascript" src="https://ru.exchange-rates.org/GetCustomContent.aspx?sid=RT000JTFR&amp;type=RatesTable&amp;stk=-0CQ8XBC34F" charset="utf-8"></script>
-				<div>Источник: <a href="https://ru.exchange-rates.org/" target="_blank" rel="nofollow">ru.exchange-rates.org</a></div>
+				<script type="text/javascript" src="https://ru.exchange-rates.org/GetCustomContent.aspx?sid=RT000JU97&amp;type=RatesTable&amp;stk=-0L8O3U15SJ" charset="utf-8">
+				</script>
+				<div>Источник: <a href="https://ru.exchange-rates.org/" rel="nofollow">ru.exchange-rates.org</a></div>
 			</div>
 		</div>
 	</div>
