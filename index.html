@@ -12,7 +12,7 @@
     <script src="app.js"></script>
 	<!--<script src="app.min.js"></script>-->
 </head>
-<body ng-app="app" ng-controller="calculatorCtrl">
+<body ng-app="app" ng-controller="calculatorCtrl" ng-cloak>
 
 <input type="checkbox" class="big-checkbox float-left" data-object-toggle style="margin: 15px;" />
 
@@ -77,12 +77,11 @@
 			</table>
 
 
-			<div id="currenciesTable" class="padding10-0">
-				<div class="text-right" style="margin-top: -30px;">
-					Процент надбавки: <input type="number" step="0.01"
-											 ng-model="expCalc.settings.currencies.commonSurcharge"
-											 ng-change="addSurcharge()"/>
+			<div id="currenciesTable">
+				<div class="padding5-0 text-right" style="margin-top: -10px;">
 					<button class="btn btn-success" type="button" ng-click="updateCurrencies()">Обновить курсы валют</button>
+					Процент надбавки:
+					<input type="number" class="form-control inline-block" step="0.1" ng-model="expCalc.settings.currencies.commonSurcharge"/>
 				</div>
 				<script type="text/javascript" src="https://ru.exchange-rates.org/GetCustomContent.aspx?sid=RT000JU97&amp;type=RatesTable&amp;stk=-0L8O3U15SJ" charset="utf-8">
 				</script>
@@ -220,6 +219,16 @@
 											<input type="checkbox" class="big-checkbox" ng-model="expense.isPaid" />
 										</div>
 									</div>
+
+									<ul>
+										<li class="padding5-0" ng-repeat="participation in expense.partList track by $index">
+											<input type="checkbox" class="big-checkbox"
+												   ng-model="expense.partList[$index]"
+												   ng-change="checkPartList(expense.partList, $index)"
+												   ng-disabled="expense.isPaid" />
+											{{account.participants[$index].meta.title}}
+										</li>
+									</ul>
 								</li>
 
 								<li class="padding5-0 bg">
@@ -610,7 +619,10 @@
 			</tr>
 
 			<tr ng-repeat="expense in participant.expenses track by $index">
-				<td>{{expense.title}}</td>
+				<td>
+					<span class="float-left">{{$index + 1}}.</span>
+					{{expense.title}}
+				</td>
 				<td><span class="small">{{expCalc.settings.expensesTypes[expense.type].name}}</span></td>
 				<td><span class="small">{{formatDate(expense.date)}}</span></td>
 				<td class="border-right"><span class="nowrap">{{expense.value}} {{expCalc.settings.currencies.names[expense.currency].toUpperCase()}}</span></td>

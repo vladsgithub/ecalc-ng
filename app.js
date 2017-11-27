@@ -271,17 +271,17 @@
             });
         };
 
-        $scope.addSurcharge = function() {
-            var commonSurcharge = $scope.expCalc.settings.currencies.commonSurcharge;
-
-            $scope.expCalc.settings.currencies.rates.forEach(function(ratesRow, i) {
-                ratesRow.forEach(function(rate, j) {
-                    if (i != j) {
-                        $scope.expCalc.settings.currencies.rates[i][j] = rate + Math.round(100000 * rate * (commonSurcharge / 100)) / 100000;
-                    }
-                });
-            });
-        };
+        // $scope.addSurcharge = function() {
+        //     var commonSurcharge = $scope.expCalc.settings.currencies.commonSurcharge;
+        //
+        //     $scope.expCalc.settings.currencies.rates.forEach(function(ratesRow, i) {
+        //         ratesRow.forEach(function(rate, j) {
+        //             if (i != j) {
+        //                 $scope.expCalc.settings.currencies.rates[i][j] = rate + Math.round(100000 * rate * (commonSurcharge / 100)) / 100000;
+        //             }
+        //         });
+        //     });
+        // };
 
 
 
@@ -800,7 +800,8 @@
         };
 
         $scope.updateCurrencies = function () {
-            var rows, currentCurrencies;
+            var rows, currentCurrencies, exactRate;
+            var surchargePercent = $scope.expCalc.settings.currencies.commonSurcharge;
             var table = document.getElementById('currenciesTable').querySelectorAll('table')[0];
 
             if (!table) {
@@ -849,13 +850,12 @@
                         digitsNumber = (byValue.toString().length > baseValue.toString().length) ? byValue.toString().length : baseValue.toString().length;
                         for (var m = 0; m < digitsNumber; m++) capacity *= 10;
 
-                        // console.log(digitsNumber, capacity, currencyName, comparableCurrency, '=', Math.round(capacity * byValue / baseValue) / capacity, byValue / baseValue);
-                        currentCurrencies.rates[j][i] = Math.round(capacity * byValue / baseValue) / capacity;
+                        exactRate = byValue / baseValue;
+                        currentCurrencies.rates[j][i] = (currencyName == comparableCurrency) ?
+                            1 : Math.round(capacity * exactRate * (1 + (surchargePercent / 100))) / capacity;
                     }
                 });
             });
-
-            $scope.addSurcharge();
         };
 
 

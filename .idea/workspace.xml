@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ed629a3b-96bf-4c8b-b90f-05581bacd726" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
     </list>
@@ -21,11 +22,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="453">
-              <caret line="279" column="79" lean-forward="false" selection-start-line="279" selection-start-column="79" selection-end-line="279" selection-end-column="79" />
+            <state relative-caret-position="153">
+              <caret line="626" column="71" lean-forward="false" selection-start-line="626" selection-start-column="8" selection-end-line="626" selection-end-column="71" />
               <folding />
             </state>
           </provider>
@@ -41,11 +42,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="83" column="68" lean-forward="false" selection-start-line="83" selection-start-column="56" selection-end-line="83" selection-end-column="68" />
+            <state relative-caret-position="643">
+              <caret line="227" column="51" lean-forward="false" selection-start-line="227" selection-start-column="51" selection-end-line="227" selection-end-column="51" />
               <folding>
                 <element signature="n#style#0;n#input#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#header#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -69,7 +70,7 @@
       <file leaf-file-name="app.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/css/app.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
+            <state relative-caret-position="840">
               <caret line="42" column="5" lean-forward="false" selection-start-line="42" selection-start-column="5" selection-end-line="42" selection-end-column="5" />
               <folding />
             </state>
@@ -88,11 +89,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>today</find>
-      <find>currencies-box</find>
-      <find>$scope.exact</find>
-      <find>margin-left: 50px;</find>
-      <find>participant.meta.total</find>
       <find>extParticipantIndex</find>
       <find>expense.title</find>
       <find>format</find>
@@ -118,6 +114,11 @@
       <find>-30</find>
       <find>ng-change</find>
       <find>addSurcharge</find>
+      <find>updateCurrencies</find>
+      <find>addSur</find>
+      <find>flex-grow1</find>
+      <find>[</find>
+      <find>нельзя отм</find>
     </findStrings>
     <replaceStrings>
       <replace>'</replace>
@@ -152,8 +153,8 @@
         <option value="$PROJECT_DIR$/name-list2.html" />
         <option value="$PROJECT_DIR$/app-min.js" />
         <option value="$PROJECT_DIR$/css/app.css" />
-        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/app.js" />
+        <option value="$PROJECT_DIR$/index.html" />
       </list>
     </option>
   </component>
@@ -184,7 +185,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -199,6 +199,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -295,12 +296,13 @@
       <workItem from="1508747180505" duration="65408000" />
       <workItem from="1510154162081" duration="3108000" />
       <workItem from="1510302539758" duration="815000" />
-      <workItem from="1510842561002" duration="23768000" />
+      <workItem from="1510842561002" duration="24770000" />
+      <workItem from="1511788551906" duration="5951000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="447120000" />
+    <option name="totallyTimeSpent" value="454073000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -344,6 +346,14 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/css/app.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="840">
+          <caret line="42" column="5" lean-forward="false" selection-start-line="42" selection-start-column="5" selection-end-line="42" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="16380">
@@ -887,24 +897,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/css/app.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
+        <state relative-caret-position="840">
           <caret line="42" column="5" lean-forward="false" selection-start-line="42" selection-start-column="5" selection-end-line="42" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Project/KRONOS/Classic WFR/Patch/for combobox on Iphone 7.js">
+    <entry file="file://D:/Project/KRONOS/Classic WFR/Patch/for combobox on Iphone 7.js" />
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="153">
+          <caret line="626" column="71" lean-forward="false" selection-start-line="626" selection-start-column="8" selection-end-line="626" selection-end-column="71" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="83" column="68" lean-forward="false" selection-start-line="83" selection-start-column="56" selection-end-line="83" selection-end-column="68" />
+        <state relative-caret-position="643">
+          <caret line="227" column="51" lean-forward="false" selection-start-line="227" selection-start-column="51" selection-end-line="227" selection-end-column="51" />
           <folding>
             <element signature="n#style#0;n#input#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#header#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -921,14 +932,6 @@
             <element signature="n#style#0;n#span#0;n#td#1;n#tr#2;n#tbody#7;n#table#1;n#div#0;n#main#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="453">
-          <caret line="279" column="79" lean-forward="false" selection-start-line="279" selection-start-column="79" selection-end-line="279" selection-end-column="79" />
-          <folding />
         </state>
       </provider>
     </entry>
